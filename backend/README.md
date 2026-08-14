@@ -24,8 +24,15 @@ Other scripts:
 | `npm start`     | Run the compiled server               |
 | `npm run seed`  | (Re)seed the database (idempotent)    |
 | `npm test`      | Vitest unit tests                     |
+| `npm run build:seed` | Compile the seed for the Docker image (`dist-seed/`) |
 
 Set `PORT` to override the default `3000`.
+
+To use the moderation API and the web console, start the server with a token:
+
+```bash
+ADMIN_TOKEN=$(openssl rand -hex 24) npm run dev
+```
 
 ## Environment variables
 
@@ -36,6 +43,7 @@ from the process environment (there is no dotenv loader), e.g.
 | Variable       | Default                  | Meaning                                   |
 |----------------|--------------------------|-------------------------------------------|
 | `PORT`         | `3000`                   | HTTP port                                 |
+| `ADMIN_TOKEN`  | _(unset)_                | Shared secret for `/api/admin/*`. Unset or under 16 chars ⇒ moderation disabled (503) |
 | `OLLAMA_URL`   | `http://localhost:11434` | Ollama base URL for the LLM layer         |
 | `OLLAMA_MODEL` | `llama3.2`               | Model for the LLM second opinion          |
 | `LLM_ENABLED`  | `auto`                   | `auto` \| `true` \| `false` (see below)   |
@@ -125,6 +133,27 @@ Base URL: `http://localhost:3000/api`. All errors return
   (`reports` still counts all approved reports); `totalCount` always reflects
   the full list so clients can detect drift and re-sync.
 
+### Moderation (admin)
+
+Reports are submitted `PENDING` and only `APPROVED` ones are public, so these
+routes are what make community reports work at all. They require the
+`x-admin-token` header to match `ADMIN_TOKEN` (compared timing-safely) and
+**fail closed**: with no token configured, or one under 16 characters, they
+answer `503 ADMIN_DISABLED` instead of opening up.
+
+- `GET /admin/reports?status=PENDING&type=&page=1` — moderation queue,
+  oldest-first (FIFO). Returns any status and includes `description`,
+  `reporterName`, `normalizedValue`, `status` — the fields the public search
+  hides but a moderator needs.
+- `GET /admin/stats` — `{ byStatus, pendingByType, total }`, with every
+  status and type key always present.
+- `PATCH /admin/reports/:id` — body `{ "status": "APPROVED" | "REJECTED" }`.
+  The only path that can publish a report. Returns the updated report plus
+  `previousStatus`. Any other status is a 400; an unknown id is a 404.
+
+Approving a `PHONE` report also lands it in `GET /blocklist/phones`, which the
+mobile app syncs for offline call and SMS screening.
+
 ### Awareness hub
 
 - `GET /articles` — bilingual article list (metadata only).
@@ -141,7 +170,8 @@ Base URL: `http://localhost:3000/api`. All errors return
 ## Project layout
 
 ```
-prisma/schema.prisma        # Report, Article, QuizQuestion, CheckLog
+prisma/schema.prisma        # Report, Article, QuizQuestion, CheckLog (SQLite, dev)
+prisma/postgres/            # production schema + migrations (see below)
 prisma/seed.ts              # bilingual seed content
 src/index.ts                # entry point
 src/app.ts                  # express app wiring (CORS, /api router)
@@ -150,12 +180,39 @@ src/services/messageAnalyzer.ts  # message rule engine (sender-aware)
 src/services/llmAnalyzer.ts      # optional Ollama second-opinion layer
 src/services/socialChecker.ts    # social-account impersonation checker
 src/services/senderChecker.ts    # sender/caller trust resolution
-src/routes/                 # check, reports, flagged-urls, articles, quiz
+src/routes/                 # check, reports, flagged-urls, articles, quiz, admin
 src/lib/normalize.ts        # phone/URL/account normalization
 src/lib/brands.ts           # shared Palestinian brand list + impersonation match
 src/middleware/errorHandler.ts   # { error: { code, message } }
+src/middleware/adminAuth.ts      # x-admin-token guard (fails closed)
 tests/                      # vitest unit tests
 ```
+
+## Databases: SQLite in dev, PostgreSQL in production
+
+Prisma will not take the datasource `provider` from an environment variable,
+so there are two schema files:
+
+| File | Provider | Used by |
+|---|---|---|
+| `prisma/schema.prisma` | SQLite | development and tests (`prisma/dev.db`) |
+| `prisma/postgres/schema.prisma` | PostgreSQL | the Docker image |
+
+**Keep the models in sync** — `prisma/schema.prisma` is the source of truth.
+After changing a model, regenerate the production migration:
+
+```bash
+npx prisma migrate diff --from-empty \
+  --to-schema-datamodel prisma/postgres/schema.prisma --script \
+  > prisma/postgres/migrations/0_init/migration.sql
+```
+
+## Docker
+
+Built from this directory; see `../docker-compose.yml` for the full stack.
+The image compiles the seed to `dist-seed/` so the runtime needs no `tsx`, and
+`docker-entrypoint.sh` applies migrations before the server accepts traffic
+(then seeds when `SEED_ON_START=true`).
 
 ## Scam categories
 

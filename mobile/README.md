@@ -54,6 +54,29 @@ Permissions added to the Android manifest: `RECEIVE_SMS`,
 notification permission is requested together with the SMS permission on
 Android 13+).
 
+### Why this is Android-only
+
+This is a **permanent iOS platform restriction, not unfinished work.** iOS
+gives no app the ability to:
+
+- **read incoming SMS content** — there is no `RECEIVE_SMS` equivalent.
+  `ILMessageFilterExtension` can only sort messages from unknown senders into
+  fixed folders; it never hands the text to the app and cannot call a server
+  per message, so `POST /analyze-message` can't be part of the path.
+- **draw over other apps** — there is no `SYSTEM_ALERT_WINDOW` equivalent, so
+  the warning overlay has nowhere to render.
+- **see an incoming call** — `CallKit` only matches against a blocklist the
+  app supplies in advance, which the system reads directly. The app is never
+  told a call arrived, so it cannot explain *why* a number is suspicious.
+
+The portable part is the blocklist itself: a `CallKit` /
+`ILMessageFilter` extension could publish approved `PHONE` reports to iOS and
+let the system block matches **silently** — blocking without a verdict, score,
+reasons, or overlay. That is listed under future work in
+[`../PROJECT_PLAN.md`](../PROJECT_PLAN.md) §7b. Until then `ProtectionService`
+returns `false` on every non-Android platform without touching the
+MethodChannel, and the tab explains the limitation instead of failing.
+
 ### Demo on the Android emulator
 
 1. Run the backend and the app, open **الحماية / Protection**, grant the
