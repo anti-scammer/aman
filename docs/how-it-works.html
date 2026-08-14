@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palestinian User Protection Platform from Digital Fraud — Methodology &amp; Design</title>
+<title>Palestinian User Protection Platform from Digital Fraud: Methodology &amp; Design</title>
 <style>
   :root {
     color-scheme: light;
@@ -117,8 +117,11 @@
 <header class="doc">
   <div class="inner">
     <h1>Palestinian User Protection Platform from Digital Fraud</h1>
-    <p class="sub">Methodology &amp; System Design Document — how the platform detects suspicious links, measures their spread, and protects users without surveilling them</p>
-    <div class="meta">Graduation Project · July 2026 · Prepared by: <em>[student names]</em> · Supervisor: <em>[supervisor name]</em></div>
+    <p class="sub">Methodology &amp; System Design Document: how the platform detects suspicious links, measures their spread, and protects users without surveilling them</p>
+    <div class="meta">Graduation Project · Revised August 2026</div>
+    <div class="meta">Prepared by: Dania Abu Muailek · Arwa Khudair · Ru'a Bashir · Joman Al-Hasanat · Malak Rayyan</div>
+    <div class="meta">Supervisor: Hadi Alnabriss</div>
+    <div class="meta">Describes the system <strong>as implemented</strong>. Milestones 1 to 5 are complete (§14); the accuracy evaluation of §13.1 is still pending its labeled corpus.</div>
   </div>
 </header>
 
@@ -132,12 +135,14 @@
     <li><a href="#idea">The Idea</a></li>
     <li><a href="#arch">System Architecture</a></li>
     <li><a href="#method">Methodology</a></li>
-    <li><a href="#q-suspicious">Q1 — How do we determine that a link is suspicious?</a></li>
-    <li><a href="#q-visits">Q2 — How do we know how many people visited a link?</a></li>
-    <li><a href="#q-monitor">Q3 — How do we “monitor” users who visited links?</a></li>
+    <li><a href="#q-suspicious">Q1. How do we determine that a link is suspicious?</a></li>
+    <li><a href="#q-visits">Q2. How do we know how many people visited a link?</a></li>
+    <li><a href="#q-monitor">Q3. How do we “monitor” users who visited links?</a></li>
     <li><a href="#messages">Message (SMS/WhatsApp) Analysis</a></li>
     <li><a href="#data">Data Model</a></li>
-    <li><a href="#eval">Evaluation Plan</a></li>
+    <li><a href="#moderation">Moderation: how a report becomes public</a></li>
+    <li><a href="#deploy">Deployment</a></li>
+    <li><a href="#eval">Evaluation &amp; Verification</a></li>
     <li><a href="#timeline">Implementation Timeline</a></li>
     <li><a href="#refs">References</a></li>
   </ol>
@@ -150,7 +155,7 @@ Digital fraud against Palestinian users was relatively limited before the war on
 sharply during and since it: fake prize draws impersonating telecom operators (Jawwal, Ooredoo), phishing
 pages imitating local banks and e-wallets (Bank of Palestine, PalPay, Jawwal Pay, Reflect), fake delivery-fee
 requests, fraudulent job offers, and fake donation campaigns exploiting the humanitarian situation. Victims
-lose money, credentials, and accounts — and today there is <strong>no local, Arabic-first tool</strong> where a
+lose money, credentials, and accounts, and today there is <strong>no local, Arabic-first tool</strong> where a
 Palestinian user can check a suspicious link or message before acting on it, or look up whether a phone
 number or page has already been reported as a scam.
 </p>
@@ -169,19 +174,18 @@ Link-safety checking is a mature research and industry area. The main families o
 <h3>2.1 Industrial blocklist services</h3>
 <p>
 <strong>Google Safe Browsing</strong> [1] maintains blocklists of phishing/malware URLs and serves them to
-browsers via a privacy-preserving API (clients query hashed URL prefixes, so Google never sees the full
-browsing history — a design we borrow in §8). <strong>PhishTank</strong> [2] is a community platform where
-users submit and vote on phishing URLs — the closest existing model to our community-reporting feature.
+browsers via a privacy-preserving API (clients query hashed URL prefixes, so Google never sees the full browsing history, a design we borrow in §8). <strong>PhishTank</strong> [2] is a community platform where
+users submit and vote on phishing URLs, the closest existing model to our community-reporting feature.
 <strong>VirusTotal</strong> [3] aggregates ~90 scanning engines for URLs/files. <strong>ScamAdviser</strong> [4]
 computes a website trust score from domain age, hosting, and reviews.
 </p>
 <h3>2.2 Academic work on URL classification</h3>
 <p>
 Ma et&nbsp;al. [5] showed that malicious URLs can be detected from <em>lexical and host-based features alone</em>
-(length, tokens, TLD, IP-literal hosts, WHOIS age) — the scientific basis for our heuristic engine.
+(length, tokens, TLD, IP-literal hosts, WHOIS age), which is the scientific basis for our heuristic engine.
 Whittaker et&nbsp;al. [6] describe Google's large-scale phishing page classifier. Sahingoz et&nbsp;al. [7] and
 Mohammad et&nbsp;al. [8] demonstrate machine-learning phishing detection from URL features with F1 scores
-above 0.95 on public datasets — the path our platform follows in future work, once our community database
+above 0.95 on public datasets, the path our platform follows in future work, once our community database
 has accumulated labeled local data. The APWG Phishing Activity Trends Reports [9] document the global growth
 of phishing campaigns, and 7amleh [10] documents the Palestinian digital-safety context.
 </p>
@@ -200,20 +204,26 @@ of phishing campaigns, and 7amleh [10] documents the Palestinian digital-safety 
     <tr><td>Localized awareness &amp; quizzes</td><td class="no-x">✗</td><td class="no-x">✗</td><td class="no-x">✗</td><td class="part">partial</td><td class="yes">✓</td></tr>
   </tbody>
 </table>
-<p class="footnote">Table 1 — Feature comparison with existing platforms. No existing tool combines link checking with Arabic message analysis and a local community registry.</p>
+<p class="footnote">Table 1. Feature comparison with existing platforms. No existing tool combines link checking with Arabic message analysis and a local community registry.</p>
 
 <!-- ================================================================ -->
 <h2 id="idea"><span class="no">3.</span>The Idea</h2>
-<p>One platform, four protective functions, available as a website and a mobile app:</p>
+<p>One platform, six protective functions, available as a website and a mobile app:</p>
 <div class="grid">
   <div class="card"><h4>1 · URL Checker</h4><p>Paste any link → multi-signal analysis → verdict (<em>safe / suspicious / dangerous</em>) with human-readable reasons in Arabic and English.</p></div>
-  <div class="card"><h4>2 · Message Analyzer</h4><p>Paste an SMS/WhatsApp text → bilingual scam-pattern engine detects prize, delivery, job, OTP and bank-phishing scams; embedded links are auto-extracted and checked.</p></div>
-  <div class="card"><h4>3 · Community Reports</h4><p>Users report scam phone numbers, links, and social accounts. Everyone can search the registry before trusting a contact. Reports feed back into URL scoring.</p></div>
-  <div class="card"><h4>4 · Awareness Hub + Flagged Feed</h4><p>Localized articles and quizzes, plus a public live feed of links the platform has recently flagged — “what scams are active right now.”</p></div>
+  <div class="card"><h4>2 · Message Analyzer</h4><p>Paste an SMS/WhatsApp text → bilingual scam-pattern engine detects prize, delivery, job, OTP and bank-phishing scams; embedded links are auto-extracted and checked. Optionally sender-aware (§9).</p></div>
+  <div class="card"><h4>3 · Social Account Checker</h4><p>Paste a profile URL or bare <code>@handle</code> → platform detection plus brand-impersonation scoring (Levenshtein and substring matching against the Palestinian brand list), scam keywords, and the digit-suffix pattern typical of cloned pages.</p></div>
+  <div class="card"><h4>4 · Sender / Caller Checker</h4><p>Look up a phone number or SMS sender ID against a curated registry of genuine Palestinian senders (telecoms, banks, government) and the community report database → <em>official / reported / unknown</em>.</p></div>
+  <div class="card"><h4>5 · Community Reports</h4><p>Users report scam phone numbers, links, and social accounts. Everyone can search the registry before trusting a contact. Reports feed back into URL scoring, once moderation (§11) approves them.</p></div>
+  <div class="card"><h4>6 · Awareness Hub + Flagged Feed</h4><p>Localized articles and quizzes, plus a public live feed of links the platform has recently flagged: “what scams are active right now.”</p></div>
 </div>
 <p>
-The system creates a <strong>feedback loop</strong>: every check and every report makes the next check smarter —
-community reports raise the risk score of matching URLs, and unusually frequent checks of the same URL signal
+On Android the mobile app adds a seventh function that a website structurally cannot provide:
+<strong>real-time protection</strong>: screening incoming calls and SMS against the community blocklist
+as they arrive, entirely on the device (§8.1).
+</p>
+<p>
+The system creates a <strong>feedback loop</strong>: every check and every report makes the next check smarter: community reports raise the risk score of matching URLs, and unusually frequent checks of the same URL signal
 an active campaign.
 </p>
 
@@ -222,37 +232,29 @@ an active campaign.
 <figure class="diagram">
 <pre class="mermaid">
 flowchart TB
-    subgraph Clients
-        W["Web App<br/>React + TypeScript"]
-        M["Mobile App<br/>Flutter (Android / iOS)"]
-    end
-    subgraph Backend["Backend — Node.js + Express (REST API)"]
-        UC["URL Checker Engine<br/>(weighted heuristics)"]
-        MA["Message Analyzer<br/>(bilingual rule engine)"]
-        RP["Reports Service<br/>(submit / search / moderate)"]
-        AW["Awareness Service<br/>(articles + quiz)"]
-        FL["Flagged-Links Feed"]
-    end
-    DB[("Database<br/>SQLite (dev) → PostgreSQL (prod)<br/>Reports · CheckLog · Articles · Quiz")]
-    W -- "REST / JSON" --> Backend
-    M -- "REST / JSON" --> Backend
-    UC --> DB
-    MA --> UC
-    MA --> DB
-    RP --> DB
-    AW --> DB
-    FL --> DB
+    W["Web app<br/>React + TypeScript"] -- "REST / JSON" --> API
+    M["Mobile app<br/>Flutter"] -- "REST / JSON" --> API
+    AD["Moderation console<br/>/admin"] -- "x-admin-token" --> API
+    M --> N["Android native layer<br/>call screening · SMS · overlay"]
+    N -- "blocklist sync, then offline matching" --> API
+    API["<b>REST API</b> · Node.js + Express<br/>─────────────<br/>Detection: URL · message · social · sender<br/>Community: reports · moderation · flagged feed · blocklist<br/>Content: articles · quiz"]
+    API -. "bounded second opinion" .-> LLM(["Local LLM (optional)<br/>Ollama · ±25 max"])
+    API --> DB[("SQLite dev → PostgreSQL prod<br/>Reports · CheckLog · Articles · Quiz")]
 </pre>
-<figcaption>Figure 1 — System architecture. Both clients consume the same REST API; the message analyzer reuses the URL engine for links found inside messages.</figcaption>
+<figcaption>Figure 1. System architecture as implemented. All clients consume the same REST API. The message analyzer reuses the URL engine for embedded links and the sender checker for sender trust. Moderation is the only writer that can flip a report to <code>APPROVED</code>, which is what makes it visible to the reports search, the flagged feed, and the phone blocklist the mobile app syncs.</figcaption>
 </figure>
 <table>
   <thead><tr><th>Layer</th><th>Technology</th><th>Why</th></tr></thead>
   <tbody>
     <tr><td>Web frontend</td><td>React + Vite + TypeScript</td><td>Fast development, type safety, easy RTL/i18n</td></tr>
     <tr><td>Mobile</td><td>Flutter</td><td>One codebase for Android + iOS, strong RTL support</td></tr>
+    <tr><td>Real-time protection</td><td>Kotlin (Android native)</td><td>Call screening, SMS receipt and system overlay are OS-level capabilities Flutter cannot reach (§8.1)</td></tr>
     <tr><td>Backend</td><td>Node.js + Express + TypeScript</td><td>Same language as frontend, large ecosystem</td></tr>
     <tr><td>ORM / DB</td><td>Prisma + SQLite → PostgreSQL</td><td>Zero-setup development, drop-in production upgrade</td></tr>
     <tr><td>Validation</td><td>Zod schemas</td><td>Every API input validated server-side</td></tr>
+    <tr><td>Optional AI layer</td><td>Ollama (local LLM)</td><td>A bounded second opinion on messages that runs on the operator's own machine, so no message ever leaves it (§9.3)</td></tr>
+    <tr><td>Deployment</td><td>Docker Compose + nginx</td><td>Reproducible production stack; nginx serves the SPA and proxies the API (§12)</td></tr>
+    <tr><td>Testing</td><td>Vitest · testing-library · flutter test</td><td>151 automated tests across the three tiers (§13.2)</td></tr>
   </tbody>
 </table>
 
@@ -272,7 +274,7 @@ flowchart LR
     E -->|feedback| C
     E --> F["6 · Deployment &amp;<br/>documentation"]
 </pre>
-<figcaption>Figure 2 — Methodology phases. Evaluation feeds back into design: misclassified samples become new rules or adjusted weights.</figcaption>
+<figcaption>Figure 2. Methodology phases. Evaluation feeds back into design: misclassified samples become new rules or adjusted weights.</figcaption>
 </figure>
 <table>
   <thead><tr><th>Phase</th><th>Activities</th><th>Output</th></tr></thead>
@@ -287,15 +289,13 @@ flowchart LR
 </table>
 
 <!-- ================================================================ -->
-<h2 id="q-suspicious"><span class="no">6.</span>Q1 — How do we determine that a link is suspicious?</h2>
+<h2 id="q-suspicious"><span class="no">6.</span>Q1. How do we determine that a link is suspicious?</h2>
 <div class="card callout q">
   <p class="qtitle">Professor's question</p>
   <p style="margin:0">“How will you decide whether a link is suspicious?”</p>
 </div>
 <p>
-A URL is never judged by one signal. The engine evaluates <strong>independent weighted signals</strong> from
-three families — lexical (the URL text itself), transport (encryption), and community (our own database) —
-and combines them into a 0–100 risk score. This mirrors the feature families proven effective in the
+A URL is never judged by one signal. The engine evaluates <strong>independent weighted signals</strong> from three families, namely lexical (the URL text itself), transport (encryption), and community (our own database), and combines them into a 0–100 risk score. This mirrors the feature families proven effective in the
 literature [5][7], implemented as transparent rules so every verdict can be <em>explained to the user</em>.
 </p>
 
@@ -303,26 +303,26 @@ literature [5][7], implemented as transparent rules so every verdict can be <em>
 <table>
   <thead><tr><th>#</th><th>Signal</th><th>Family</th><th>Example trigger</th><th class="num">Weight</th></tr></thead>
   <tbody>
-    <tr><td>S1</td><td>Palestinian brand lookalike — registrable domain within Levenshtein distance ≤ 2 of a protected brand (jawwal, ooredoo, bankofpalestine, palpay, reflect…) or brand name embedded in a non-official domain</td><td>Lexical</td><td><code>jawwal-prize.win</code></td><td class="num">+35</td></tr>
+    <tr><td>S1</td><td>Palestinian brand lookalike: registrable domain within Levenshtein distance ≤ 2 of a protected brand (jawwal, ooredoo, bankofpalestine, palpay, reflect…) or brand name embedded in a non-official domain</td><td>Lexical</td><td><code>jawwal-prize.win</code></td><td class="num">+35</td></tr>
     <tr><td>S2</td><td>IP-literal host</td><td>Lexical</td><td><code>http://185.12.4.9/login</code></td><td class="num">+30</td></tr>
     <tr><td>S3</td><td>Punycode / IDN homograph</td><td>Lexical</td><td><code>xn--jwwl-…</code></td><td class="num">+30</td></tr>
     <tr><td>S4</td><td><code>user@host</code> credential trick</td><td>Lexical</td><td><code>http://bop.ps@evil.com</code></td><td class="num">+30</td></tr>
     <tr><td>S5</td><td>High-abuse TLD (<code>.win .top .xyz .icu .buzz</code>…)</td><td>Lexical</td><td><code>prize-draw.top</code></td><td class="num">+20</td></tr>
     <tr><td>S6</td><td>URL shortener hiding the destination</td><td>Lexical</td><td><code>bit.ly/3xY…</code></td><td class="num">+20</td></tr>
     <tr><td>S7</td><td>Scam keywords in domain/path (prize, win, free, gift, verify…)</td><td>Lexical</td><td><code>/claim-prize</code></td><td class="num">+15</td></tr>
-    <tr><td>S8</td><td><strong>No HTTPS</strong> — the link is unencrypted, so any submitted data travels in clear text</td><td>Transport</td><td><code>http://…</code></td><td class="num">+15</td></tr>
+    <tr><td>S8</td><td><strong>No HTTPS</strong>: the link is unencrypted, so any submitted data travels in clear text</td><td>Transport</td><td><code>http://…</code></td><td class="num">+15</td></tr>
     <tr><td>S9</td><td>Excessive subdomain nesting (≥ 3)</td><td>Lexical</td><td><code>login.bop.secure.evil.com</code></td><td class="num">+10</td></tr>
-    <tr><td>S10</td><td>Community reports — each approved report matching this URL</td><td>Community</td><td>3 reports → +15</td><td class="num">+5 each (max +20)</td></tr>
-    <tr><td>S11</td><td>Check-frequency spike — same URL checked unusually often recently (§7)</td><td>Community</td><td>campaign in progress</td><td class="num">+10</td></tr>
+    <tr><td>S10</td><td>Community reports: each approved report matching this URL</td><td>Community</td><td>3 reports → +15</td><td class="num">+5 each (max +20)</td></tr>
+    <tr><td>S11</td><td>Check-frequency spike: same URL checked unusually often recently (§7)</td><td>Community</td><td>campaign in progress</td><td class="num">+10</td></tr>
   </tbody>
 </table>
-<p class="footnote">Table 2 — Signal catalog. Weights were set from the relative severity reported in the literature [5][8] and will be tuned in the evaluation phase (§11).</p>
+<p class="footnote">Table 2. Signal catalog. Weights were set from the relative severity reported in the literature [5][8] and will be tuned in the evaluation phase (§11).</p>
 
 <h3>6.2 Scoring and verdict</h3>
 <div class="formula">
 Score(u) = min(100, &nbsp;Σ wᵢ·xᵢ(u) &nbsp;+&nbsp; min(20, 5·R(u)) &nbsp;+&nbsp; 10·F(u))
 <br><br>
-xᵢ(u) ∈ {0,1} — signal i triggered · R(u) — approved community reports · F(u) — frequency-spike flag
+xᵢ(u) ∈ {0,1} = signal i triggered · R(u) = approved community reports · F(u) = frequency-spike flag
 </div>
 <div class="band" role="img" aria-label="Verdict thresholds: 0 to 29 safe, 30 to 59 suspicious, 60 to 100 dangerous">
   <div class="b-safe">✓ SAFE&nbsp;&nbsp;0–29</div>
@@ -330,13 +330,13 @@ xᵢ(u) ∈ {0,1} — signal i triggered · R(u) — approved community reports 
   <div class="b-dang">✕ DANGEROUS&nbsp;&nbsp;60–100</div>
 </div>
 <div class="band-scale"><span>0</span><span>30</span><span>60</span><span>100</span></div>
-<p class="footnote">Figure 3 — Verdict thresholds. “Safe” means <em>no risk signals found</em>, and the UI says so honestly — absence of signals is not a guarantee.</p>
+<p class="footnote">Figure 3. Verdict thresholds. “Safe” means <em>no risk signals found</em>, and the UI says so honestly, because absence of signals is not a guarantee.</p>
 
 <h3>6.3 Worked example</h3>
 <p>Checking <code>http://jawwal-prize.win/claim</code> (a typical fake-prize campaign link):</p>
 <figure class="viz">
   <p class="viz-title">Risk-score contribution per triggered signal</p>
-  <p class="viz-sub">http://jawwal-prize.win/claim — total 100 → capped, verdict: DANGEROUS</p>
+  <p class="viz-sub">http://jawwal-prize.win/claim, total 100 → capped, verdict: DANGEROUS</p>
   <svg viewBox="0 0 760 240" width="100%" height="auto" role="img" aria-label="Bar chart: brand lookalike 35, high-abuse TLD 20, scam keywords 15, no HTTPS 15, community reports 15 points">
     <!-- rows: y = 18 + i*42; bar x from 250; scale: 35 -> 420px  => 12px/pt -->
     <g>
@@ -376,7 +376,7 @@ xᵢ(u) ∈ {0,1} — signal i triggered · R(u) — approved community reports 
     </g>
     <line class="axis" x1="250" y1="14" x2="250" y2="214"/>
   </svg>
-  <figcaption>Figure 4 — Worked scoring example. Five independent signals each contribute; the sum (100) is far past the 60-point “dangerous” threshold. The user sees each reason in Arabic or English.</figcaption>
+  <figcaption>Figure 4. Worked scoring example. Five independent signals each contribute; the sum (100) is far past the 60-point “dangerous” threshold. The user sees each reason in Arabic or English.</figcaption>
 </figure>
 
 <h3>6.4 Check pipeline</h3>
@@ -399,20 +399,20 @@ sequenceDiagram
     A-->>C: JSON result
     C-->>U: color-coded verdict + reasons (Ar/En)
 </pre>
-<figcaption>Figure 5 — URL check sequence. Every check is logged (anonymously) — the log powers the visit-proxy metrics in §7 and the flagged-links feed.</figcaption>
+<figcaption>Figure 5. URL check sequence. Every check is logged (anonymously), and the log powers the visit-proxy metrics in §7 and the flagged-links feed.</figcaption>
 </figure>
 
 <!-- ================================================================ -->
-<h2 id="q-visits"><span class="no">7.</span>Q2 — How do we know how many people visited a link?</h2>
+<h2 id="q-visits"><span class="no">7.</span>Q2. How do we know how many people visited a link?</h2>
 <div class="card callout q">
   <p class="qtitle">Professor's question</p>
   <p style="margin:0">“How will you know the number of people who visited a specific link?”</p>
 </div>
 <div class="card honest">
   <p style="margin:0"><strong>Honest scientific answer first:</strong> no third party can measure the true global
-  visit count of an arbitrary external URL — only the site's owner (or its DNS/hosting provider) has that data.
+  visit count of an arbitrary external URL. Only the site's owner (or its DNS/hosting provider) has that data.
   None of the established systems [1–4] rely on such a number either. What we <em>can</em> measure, rigorously,
-  is the link's <strong>observed spread through channels we instrument</strong> — and that is a proven proxy for
+  is the link's <strong>observed spread through channels we instrument</strong>: and that is a proven proxy for
   campaign activity. We present this limitation explicitly rather than over-claiming.</p>
 </div>
 <p>The platform measures link exposure at four tiers, from already-implemented to future work:</p>
@@ -421,11 +421,11 @@ sequenceDiagram
   <tbody>
     <tr><td><strong>A</strong></td><td><strong>Check frequency.</strong> Every URL check is logged with the normalized URL and timestamp. Many different people checking the same link in a short window ⇒ the link is circulating widely right now.</td><td>How many times the link was <em>checked</em> on our platform</td><td class="yes">Implemented</td></tr>
     <tr><td><strong>B</strong></td><td><strong>Report count.</strong> Approved community reports naming the URL.</td><td>How many people <em>reported</em> it</td><td class="yes">Implemented</td></tr>
-    <tr><td><strong>C</strong></td><td><strong>Protective warning links (interstitial redirector).</strong> When a link is flagged, the platform issues a shareable warning URL (e.g. <code>platform.ps/w/abc123</code>). People share the warning link instead of the scam link; every open is counted and the visitor sees a warning page before deciding to proceed.</td><td>True visit count <em>of the warning page</em> — a direct measure of how many people encountered the link</td><td class="part">Planned (v2)</td></tr>
-    <tr><td><strong>D</strong></td><td><strong>Opt-in browser extension.</strong> Checks visited URLs against our blocklist using hashed URL prefixes (k-anonymity, the Safe Browsing model [1]) — counts <em>encounters</em> in the wild without ever transmitting a user's browsing history.</td><td>Anonymous encounter count across consenting users</td><td class="part">Future work</td></tr>
+    <tr><td><strong>C</strong></td><td><strong>Protective warning links (interstitial redirector).</strong> When a link is flagged, the platform issues a shareable warning URL (e.g. <code>platform.ps/w/abc123</code>). People share the warning link instead of the scam link; every open is counted and the visitor sees a warning page before deciding to proceed.</td><td>True visit count <em>of the warning page</em>, a direct measure of how many people encountered the link</td><td class="part">Planned (v2)</td></tr>
+    <tr><td><strong>D</strong></td><td><strong>Opt-in browser extension.</strong> Checks visited URLs against our blocklist using hashed URL prefixes (k-anonymity, the Safe Browsing model [1]), counting <em>encounters</em> in the wild without ever transmitting a user's browsing history.</td><td>Anonymous encounter count across consenting users</td><td class="part">Future work</td></tr>
   </tbody>
 </table>
-<p class="footnote">Table 3 — Visit-measurement tiers. Tiers A+B feed signals S10/S11 in the scoring engine, closing the feedback loop.</p>
+<p class="footnote">Table 3. Visit-measurement tiers. Tiers A+B feed signals S10/S11 in the scoring engine, closing the feedback loop.</p>
 <figure class="diagram">
 <pre class="mermaid">
 sequenceDiagram
@@ -442,17 +442,17 @@ sequenceDiagram
         V-->>P: reads awareness content instead
     end
 </pre>
-<figcaption>Figure 6 — Tier C: the protective warning link both <em>counts</em> exposure and <em>interrupts</em> the scam at the moment of the click.</figcaption>
+<figcaption>Figure 6. Tier C: the protective warning link both <em>counts</em> exposure and <em>interrupts</em> the scam at the moment of the click.</figcaption>
 </figure>
 
 <!-- ================================================================ -->
-<h2 id="q-monitor"><span class="no">8.</span>Q3 — How do we “monitor” users who visited links?</h2>
+<h2 id="q-monitor"><span class="no">8.</span>Q3. How do we “monitor” users who visited links?</h2>
 <div class="card callout q">
   <p class="qtitle">Professor's question</p>
   <p style="margin:0">“How will you monitor the users who visited the links?”</p>
 </div>
 <p>
-<strong>We deliberately do not monitor individuals — the platform is designed so that it cannot.</strong>
+<strong>We deliberately do not monitor individuals. The platform is designed so that it cannot.</strong>
 Tracking what specific people visit would itself be surveillance: it would violate the privacy of the very
 users we protect, and unauthorized interception/monitoring is prohibited under the Palestinian Cybercrime
 Law by Decree No. 10 of 2018 [11]. It would also destroy user trust, which a community-reporting platform
@@ -467,13 +467,65 @@ depends on. Instead, all metrics in §7 are <strong>anonymous and aggregate by c
     </tr>
   </tbody>
 </table>
-<p class="footnote">Table 4 — Privacy-by-design data policy. No login is required to check a link or search reports; reporters may optionally leave a display name.</p>
+<p class="footnote">Table 4. Privacy-by-design data policy. No login is required to check a link or search reports; reporters may optionally leave a display name.</p>
 <p>
 For the future browser extension (Tier D), the Safe Browsing k-anonymity model [1] applies: the extension
 hashes each visited URL locally and sends only a short hash <em>prefix</em>; the server returns candidate
 matches and the final comparison happens on the device. The server therefore learns that <em>someone</em>
-encountered a flagged link — never <em>who</em>, and never the rest of their browsing.
+encountered a flagged link, never <em>who</em>, and never the rest of their browsing.
 </p>
+
+<h3>8.1 What we built instead: on-device real-time protection</h3>
+<p>
+The implemented answer to “how do you protect people at the moment of the attack, without watching them?”
+is to move the check <em>to the device</em>. The Android app screens every incoming call and SMS against
+the community blocklist and shows a warning overlay on a match, and the entire comparison happens locally,
+in native code, with no network round trip.
+</p>
+<figure class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    participant S as Server
+    participant D as Device (Kotlin)
+    participant U as User
+    Note over S,D: periodic sync: the device pulls, the server is never told who asked
+    D->>S: GET /blocklist/phones?since=...
+    S-->>D: approved numbers + report counts (delta)
+    Note over D: stored in a local JSON file
+    Note over U,D: later, offline
+    U-->>D: incoming call / SMS arrives
+    D->>D: match against local list (digits-only, last-9 fallback)
+    D-->>U: red warning overlay (call is NOT blocked)
+    Note over S: server never learns a call happened
+</pre>
+<figcaption>Figure 5b. On-device screening. The blocklist flows one way (server → device). Calls, messages, and matches never flow back, so the platform cannot know who was contacted by whom.</figcaption>
+</figure>
+<p>
+Three properties make this compatible with the privacy stance above rather than a contradiction of it:
+</p>
+<ul>
+  <li><strong>Nothing is uploaded.</strong> Call numbers and message bodies are matched on the device and never transmitted. The server only ever serves a public blocklist; it receives no telemetry in return.</li>
+  <li><strong>Nothing is blocked.</strong> The call-screening service always responds “allow”. The user is warned and decides. The platform never silently intervenes in someone's communications, which also keeps it clear of the interception prohibitions in the Cybercrime Law [11].</li>
+  <li><strong>The list is public.</strong> The blocklist is built only from <em>approved</em> community reports (§11), so nothing on a device came from surveillance. It came from people who chose to report.</li>
+</ul>
+<p>
+When the app is running, a suspicious SMS is additionally sent through the full analyzer
+(<code>POST /analyze-message</code>) for an explained verdict; when it is not, the native blocklist plus a small
+embedded keyword list still covers it. This is a deliberate trade-off: no headless background Dart isolate,
+at the cost of a shallower check while the app is closed.
+</p>
+<div class="callout">
+<p>
+<strong>Why iOS cannot do this.</strong> This is a structural platform restriction, not unfinished work. iOS
+gives no app the ability to read incoming SMS content, since <code>ILMessageFilterExtension</code> only sorts
+messages from unknown senders into fixed folders, never returning the text or permitting a per-message server
+call; to draw over other applications; or to observe that a call arrived at all, because <code>CallKit</code> matches
+a list the app supplies in advance, which the system reads directly. The portable fragment is that list: an
+iOS extension could publish approved numbers and let the system block matches <em>silently</em>, with no
+verdict, score, reasons, or overlay. The app therefore returns <code>false</code> for protection support on
+every non-Android platform and explains the limitation in the interface instead of failing.
+</p>
+</div>
 
 <!-- ================================================================ -->
 <h2 id="messages"><span class="no">9.</span>Message (SMS/WhatsApp) Analysis</h2>
@@ -493,7 +545,70 @@ bilingual rule engine over the text, then extracts any embedded URLs and runs ea
     <tr><td>CHARITY_SCAM</td><td>تبرع عاجل · حملة إغاثة</td><td>urgent donation · relief campaign</td></tr>
   </tbody>
 </table>
-<p class="footnote">Table 5 — Category pattern examples (abbreviated). Urgency markers (عاجل, فوراً, urgent) and payment requests add cross-category weight.</p>
+<p class="footnote">Table 5. Category pattern examples (abbreviated). Urgency markers (عاجل, فوراً, urgent) and payment requests add cross-category weight.</p>
+
+<h3>9.1 Sender-aware analysis</h3>
+<p>
+A message is not just its text. Who it came from matters. When the optional <code>sender</code> field is
+supplied, the analyzer resolves it through the sender checker (§3) and adjusts the score:
+</p>
+<table>
+  <thead><tr><th>Sender trust</th><th>Resolved from</th><th>Effect on score</th><th>Reason code</th></tr></thead>
+  <tbody>
+    <tr><td><strong>official</strong></td><td>Curated registry: JAWWAL, OOREDOO, PALTEL, Bank of Palestine, PALPAY, Jawwal Pay, Reflect, government IDs</td><td>−25</td><td><code>OFFICIAL_SENDER</code></td></tr>
+    <tr><td><strong>reported</strong></td><td>Matching approved <code>PHONE</code> reports</td><td>+40</td><td><code>REPORTED_SENDER</code></td></tr>
+    <tr><td><strong>unknown</strong></td><td>Neither</td><td>0 (neutral)</td><td><code>UNKNOWN_SENDER</code></td></tr>
+  </tbody>
+</table>
+<p class="footnote">Table 5b. Sender trust resolution. Phone senders are normalized to the canonical <code>+970…</code> form before matching, so <code>0599…</code> and <code>00970…</code> resolve identically.</p>
+<div class="callout">
+<p>
+<strong>The spoofing exception: why “official” is not a free pass.</strong> SMS sender IDs are trivially
+forged; a scammer can put <code>JAWWAL</code> in the from-field. So the −25 reduction is
+<em>withheld</em>, and a <code>SPOOFING_WARNING</code> reason is raised instead, whenever a message from a
+supposedly official sender also asks for an OTP or credentials, or carries a link the URL engine rated
+dangerous. The reasoning is domain knowledge, not statistics: <strong>a real bank or telecom never asks for
+your verification code</strong>, so a message that does either is not from them or is not to be trusted, and in both cases the impersonation makes it <em>more</em> dangerous, not less. Without this rule the
+sender field would be a vulnerability: attackers would simply spoof their way to a lower score.
+</p>
+</div>
+
+<h3>9.2 Worked example</h3>
+<p>
+Text: <em>«مبروك! ربحت 10000 شيكل من جوال. لاستلام الجائزة ادفع رسوم التوصيل عبر الرابط: bit.ly/jwl-prize ثم
+أرسل رمز التحقق»</em>, sender <code>JAWWAL</code>.
+</p>
+<table>
+  <thead><tr><th>Step</th><th>Signal</th><th>Contribution</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Unexpected congratulation opener: the canonical prize-scam lede</td><td>+</td></tr>
+    <tr><td>2</td><td>Claim of winning a draw the recipient never entered</td><td>+</td></tr>
+    <tr><td>3</td><td>Delivery/shipping fee demand</td><td>+</td></tr>
+    <tr><td>4</td><td>Request to transfer money up front</td><td>+</td></tr>
+    <tr><td>5</td><td>OTP request: the code is secret and is never shared</td><td>+</td></tr>
+    <tr><td>6</td><td>Embedded shortener <code>bit.ly/jwl-prize</code> routed through the URL engine</td><td>+</td></tr>
+    <tr><td>7</td><td>Sender resolves as <strong>official</strong>: but the message asks for an OTP, so the −25 is withheld</td><td><code>SPOOFING_WARNING</code></td></tr>
+  </tbody>
+</table>
+<p class="footnote">Table 5c. Verdict: <strong>dangerous</strong>, score 100/100, categories PRIZE_SCAM · DELIVERY_SCAM · OTP_THEFT · BANK_PHISHING. Every one of these reasons is shown to the user in Arabic and English, so the verdict is never a bare number.</p>
+
+<h3>9.3 Optional local-LLM second opinion</h3>
+<p>
+Rule engines are precise but literal: they miss rephrasings they were never taught. The analyzer can
+therefore consult a <strong>local</strong> large language model (Ollama) as a second opinion, deliberately
+kept on a short leash:
+</p>
+<ul>
+  <li><strong>Rules run first and always.</strong> The LLM never produces the base score; it can only adjust one that already exists, by <code>round(±confidence × 25)</code> at most.</li>
+  <li><strong>It cannot exonerate.</strong> A message the rules scored ≥ 60 is clamped at ≥ 35, so the model can never talk a dangerous message down below <em>suspicious</em>.</li>
+  <li><strong>It cannot break the service.</strong> Unreachable, timed out (12 s), or malformed output all fall back silently to rules-only analysis.</li>
+  <li><strong>It is local.</strong> The model runs on the operator's own machine; no message text is sent to any third party. Disabled by default in the Docker stack.</li>
+</ul>
+<p>
+This ordering is the point: the LLM is an <em>enhancement to recall</em> that cannot damage precision or
+availability. A graduation project that put the model in the critical path would be less trustworthy, not
+more modern.
+</p>
 
 <!-- ================================================================ -->
 <h2 id="data"><span class="no">10.</span>Data Model</h2>
@@ -534,11 +649,101 @@ erDiagram
     }
     REPORT ||--o{ CHECKLOG : "normalizedValue match raises score"
 </pre>
-<figcaption>Figure 7 — Core entities. <code>normalizedValue</code> is the join key between community reports and check logs — it powers signals S10/S11 and the flagged-links feed.</figcaption>
+<figcaption>Figure 7. Core entities. <code>normalizedValue</code> is the join key between community reports and check logs, and it powers signals S10/S11 and the flagged-links feed.</figcaption>
 </figure>
 
 <!-- ================================================================ -->
-<h2 id="eval"><span class="no">11.</span>Evaluation Plan</h2>
+<h2 id="moderation"><span class="no">11.</span>Moderation: how a report becomes public</h2>
+<p>
+A community database is only as trustworthy as its gate. If anyone could publish a report instantly, the
+platform would become an instrument for defaming a competitor's phone number or a personal enemy, the
+opposite of its purpose. So <code>Report.status</code> is not decoration: it is the mechanism.
+</p>
+<figure class="diagram">
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --> PENDING: user submits a report
+    PENDING --> APPROVED: moderator publishes
+    PENDING --> REJECTED: moderator rejects
+    APPROVED --> [*]
+    REJECTED --> [*]
+    note right of PENDING
+        invisible to everyone:
+        absent from search, stats,
+        flagged feed and blocklist
+    end note
+    note right of APPROVED
+        visible in reports search,
+        raises URL/social scores,
+        enters the phone blocklist
+        synced by the mobile app
+    end note
+</pre>
+<figcaption>Figure 7b. Report lifecycle. Every public read path filters on <code>APPROVED</code>; a single moderator decision is what propagates a report to the website, the scoring engines, and every mobile device.</figcaption>
+</figure>
+<p>
+The moderation API is guarded by a shared secret sent in the <code>x-admin-token</code> header and compared
+in constant time. Three design choices are worth stating explicitly, because each prevents a specific
+failure:
+</p>
+<table>
+  <thead><tr><th>Choice</th><th>Failure it prevents</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Fails closed</strong>: with no token configured, or one under 16 characters, the routes answer <code>503 ADMIN_DISABLED</code></td><td>A misconfigured deployment silently exposing an open moderation endpoint. The system refuses to moderate rather than letting anyone do it.</td></tr>
+    <tr><td><strong>Token in a header, never the URL</strong></td><td>Secrets leaking into server logs, browser history, and <code>Referer</code> headers.</td></tr>
+    <tr><td><strong>Queue ordered oldest-first</strong></td><td>Reports starving at the bottom of a growing list.</td></tr>
+  </tbody>
+</table>
+<p class="footnote">Table 5d. Moderation safeguards. The console lives at <code>/admin</code> and is deliberately absent from the site navigation; the token is held in <code>sessionStorage</code> so it expires with the tab unless the moderator opts into persistence.</p>
+<div class="callout">
+<p>
+<strong>An honest limitation.</strong> This is single-secret authentication, not user accounts: it identifies
+<em>a</em> moderator, not <em>which</em> moderator, and therefore supports no audit trail of who approved
+what. That is an accepted trade-off for a project with one operator. A production deployment serving a real
+community would need per-moderator accounts, an action log, and a four-eyes rule for rejections, recorded
+here as known future work rather than left as an implicit gap.
+</p>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="deploy"><span class="no">12.</span>Deployment</h2>
+<p>
+Development runs on SQLite with no external services: clone, install, migrate, run. Production runs the
+same code against PostgreSQL in containers:
+</p>
+<figure class="diagram">
+<pre class="mermaid">
+flowchart LR
+    U["Browser"] -->|":8080"| NX
+    subgraph Stack["docker compose"]
+        NX["nginx<br/>serves the SPA<br/>proxies /api"]
+        BE["backend<br/>migrate → seed → serve"]
+        PG[("PostgreSQL<br/>named volume")]
+        NX -->|"/api → :3000"| BE
+        BE --> PG
+    end
+</pre>
+<figcaption>Figure 7c. Production stack. nginx falls back to <code>index.html</code> so client-side routes such as <code>/admin</code> survive a page reload, and resolves the backend per request so it boots even while the API is still starting.</figcaption>
+</figure>
+<p>
+Two implementation details are worth recording because both were discovered by running the stack rather
+than by reading documentation:
+</p>
+<ul>
+  <li><strong>Migrations run before traffic.</strong> The container applies <code>prisma migrate deploy</code> in its entrypoint and only then starts the server, so the API is never reachable against a schema that does not yet exist. The command is idempotent, making restarts safe.</li>
+  <li><strong>Two Prisma schemas, one source of truth.</strong> Prisma will not accept the datasource <em>provider</em> from an environment variable, so running SQLite in development and PostgreSQL in production requires one schema file per provider. The development schema is authoritative and the production one is kept in sync deliberately, a maintenance cost recorded here rather than hidden.</li>
+</ul>
+
+<!-- ================================================================ -->
+<h2 id="eval"><span class="no">13.</span>Evaluation &amp; Verification</h2>
+<p>
+Two different questions have to be answered separately, and conflating them would be a mistake:
+<strong>“is the code correct?”</strong> is settled by the test suite and is answered <em>now</em>;
+<strong>“is the detection accurate?”</strong> is a measurement against labeled real-world scams and is
+answered by the evaluation below, which is still pending its corpus.
+</p>
+
+<h3>13.1 Detection accuracy (planned)</h3>
 <p>The detection engines are evaluated like classifiers, on a held-out labeled dataset (phase 2 corpus):</p>
 <table>
   <thead><tr><th>Metric</th><th>Definition</th><th>Target</th></tr></thead>
@@ -550,35 +755,81 @@ erDiagram
     <tr><td>Usability (SUS)</td><td>System Usability Scale questionnaire with ≥ 15 local users</td><td class="num">≥ 70</td></tr>
   </tbody>
 </table>
-<p class="footnote">Table 6 — Evaluation metrics. Misclassified samples from each round feed back into rule weights (Figure 2 feedback edge).</p>
+<p class="footnote">Table 6. Evaluation metrics. Misclassified samples from each round feed back into rule weights (Figure 2 feedback edge).</p>
+<div class="callout">
+<p>
+<strong>Status: not yet measured.</strong> These are targets, not results. Reporting them as achievements
+before the labeled corpus exists would misrepresent the project. What <em>is</em> measured today is the
+correctness of the implementation, below.
+</p>
+</div>
+
+<h3>13.2 Implementation correctness (achieved)</h3>
+<p>
+Every engine, endpoint, and screen is covered by automated tests that run on every change: <strong>151 across the three tiers</strong>, all passing:
+</p>
+<table>
+  <thead><tr><th>Tier</th><th>Tests</th><th>What they pin down</th></tr></thead>
+  <tbody>
+    <tr><td>Backend (vitest)</td><td>85</td><td>URL heuristics and scoring bands, message rules, sender-aware scoring and the spoofing exception, social impersonation, phone/URL normalization, the blocklist delta feed, the bounded LLM layer, and the moderation API</td></tr>
+    <tr><td>Web (vitest + testing-library)</td><td>52</td><td>API client error and network handling, Arabic/English dictionary parity, verdict rendering and score clamping, the URL-checker flow, and the moderation console including token handling</td></tr>
+    <tr><td>Mobile (flutter test)</td><td>14</td><td>Screens, models, the blocklist contract, and the protection tab in both its supported and unsupported-platform states</td></tr>
+  </tbody>
+</table>
+<p class="footnote">Table 6b. Automated test coverage. Several tests exist specifically to pin security properties rather than behaviour: that a report cannot be published without a valid token, that the admin token never appears in a URL, that a rejected token is discarded, and that <code>PENDING</code> reports never leak into any public read path.</p>
+<p>
+The moderation path is verified end-to-end rather than only in units: a test submits a report, confirms it is
+absent from public search, confirms an unauthenticated approval attempt fails with <code>401</code> and leaves
+the status untouched, approves it with a valid token, and then confirms it appears in both public search and
+the phone blocklist. The full production stack was additionally exercised in real containers against
+PostgreSQL, which is how three defects were found that unit tests could not have caught: a missing native
+dependency, a filesystem permission error under the unprivileged container user, and a proxy that resolved
+its upstream only once at start-up.
+</p>
 
 <!-- ================================================================ -->
-<h2 id="timeline"><span class="no">12.</span>Implementation Timeline</h2>
+<h2 id="timeline"><span class="no">14.</span>Implementation Timeline</h2>
 <figure class="diagram">
 <pre class="mermaid">
 gantt
     dateFormat  YYYY-MM-DD
     axisFormat  %d %b
-    title 10-Week Implementation Plan
+    title Implementation status
     section Design
-    Proposal, design, DB schema   :a1, 2026-07-06, 14d
+    Proposal, design, DB schema        :done, a1, 2026-07-06, 14d
     section Engines
-    Detection engines and tests   :a2, after a1, 14d
+    Detection engines and tests        :done, a2, after a1, 14d
     section Web
-    Reports API and web app       :a3, after a2, 14d
+    Reports API and web app            :done, a3, after a2, 14d
     section Mobile
-    Flutter app                   :a4, after a3, 14d
-    section Finish
-    Evaluation and deployment     :a5, after a4, 14d
+    Flutter app and Android protection :done, a4, after a3, 14d
+    section Milestone 5
+    Moderation, deployment, tests      :done, a5, after a4, 14d
+    section Remaining
+    Scam corpus and accuracy evaluation :active, a6, after a5, 14d
+    Thesis chapters                     :a7, after a6, 14d
 </pre>
-<figcaption>Figure 8 — Ten-week plan mapped to the methodology phases of §5.</figcaption>
+<figcaption>Figure 8. Implementation status. Milestones 1 to 5 are complete: all six platform functions, the Android real-time protection layer, report moderation, the containerized PostgreSQL deployment, and 151 automated tests. What remains is the labeled scam corpus and the accuracy evaluation of §13.1, plus the written thesis chapters.</figcaption>
 </figure>
+<table>
+  <thead><tr><th>Milestone</th><th>Scope</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Proposal, backend scaffold, DB schema, seed data</td><td class="yes">✓ complete</td></tr>
+    <tr><td>2</td><td>URL checker and message analyzer with tests</td><td class="yes">✓ complete</td></tr>
+    <tr><td>3</td><td>Reports API and the full web frontend</td><td class="yes">✓ complete</td></tr>
+    <tr><td>4</td><td>Flutter app and Android real-time protection</td><td class="yes">✓ complete</td></tr>
+    <tr><td>5</td><td>Moderation, Docker + PostgreSQL deployment, test coverage across all tiers</td><td class="yes">✓ complete</td></tr>
+    <tr><td>6</td><td>Scam corpus, accuracy evaluation (§13.1), thesis chapters</td><td class="part">in progress</td></tr>
+    <tr><td>Future</td><td>ML classifier trained on collected reports, browser extension, Safe Browsing API, iOS CallKit blocklist extension (§8.1)</td><td class="no-x">not started</td></tr>
+  </tbody>
+</table>
+<p class="footnote">Table 7. Milestone status at the time of writing. The scope beyond milestone 6 was always designated future work rather than deliverables of this project.</p>
 
 <!-- ================================================================ -->
-<h2 id="refs"><span class="no">13.</span>References</h2>
+<h2 id="refs"><span class="no">15.</span>References</h2>
 <ol class="refs">
-  <li>Google. <em>Google Safe Browsing.</em> https://safebrowsing.google.com/ — and the Safe Browsing Update API (v4) documentation on hash-prefix k-anonymity, https://developers.google.com/safe-browsing</li>
-  <li>Cisco / OpenDNS. <em>PhishTank — community phishing verification.</em> https://phishtank.org/</li>
+  <li>Google. <em>Google Safe Browsing.</em> https://safebrowsing.google.com/ plus the Safe Browsing Update API (v4) documentation on hash-prefix k-anonymity, https://developers.google.com/safe-browsing</li>
+  <li>Cisco / OpenDNS. <em>PhishTank: community phishing verification.</em> https://phishtank.org/</li>
   <li>Google (Chronicle). <em>VirusTotal.</em> https://www.virustotal.com/</li>
   <li>ScamAdviser. <em>Website trust-score checker.</em> https://www.scamadviser.com/</li>
   <li>Ma, J., Saul, L. K., Savage, S., &amp; Voelker, G. M. (2009). <em>Beyond Blacklists: Learning to Detect Malicious Web Sites from Suspicious URLs.</em> Proceedings of ACM SIGKDD (KDD '09), 1245–1254.</li>
@@ -586,11 +837,11 @@ gantt
   <li>Sahingoz, O. K., Buber, E., Demir, O., &amp; Diri, B. (2019). <em>Machine learning based phishing detection from URLs.</em> Expert Systems with Applications, 117, 345–357.</li>
   <li>Mohammad, R. M., Thabtah, F., &amp; McCluskey, L. (2014). <em>Predicting phishing websites based on self-structuring neural network.</em> Neural Computing and Applications, 25(2), 443–458.</li>
   <li>Anti-Phishing Working Group. <em>Phishing Activity Trends Reports.</em> https://apwg.org/trendsreports/</li>
-  <li>7amleh — The Arab Center for the Advancement of Social Media. <em>Reports on Palestinian digital rights and safety.</em> https://7amleh.org/</li>
+  <li>7amleh, The Arab Center for the Advancement of Social Media. <em>Reports on Palestinian digital rights and safety.</em> https://7amleh.org/</li>
   <li>Palestinian Authority. <em>Law by Decree No. 10 of 2018 on Cybercrime.</em> Official Gazette of Palestine, 2018.</li>
 </ol>
 
-<p class="footnote" style="margin-top:40px">This document is self-contained (diagram library embedded) and prints cleanly — use the browser's Print → Save as PDF to produce a submission copy.</p>
+<p class="footnote" style="margin-top:40px">This document is self-contained (diagram library embedded) and prints cleanly. Use the browser's Print → Save as PDF to produce a submission copy.</p>
 
 </div>
 
