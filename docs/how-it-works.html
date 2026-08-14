@@ -412,7 +412,7 @@ sequenceDiagram
   <p style="margin:0"><strong>Honest scientific answer first:</strong> no third party can measure the true global
   visit count of an arbitrary external URL. Only the site's owner (or its DNS/hosting provider) has that data.
   None of the established systems [1–4] rely on such a number either. What we <em>can</em> measure, rigorously,
-  is the link's <strong>observed spread through channels we instrument</strong>: and that is a proven proxy for
+  is the link's <strong>observed spread through channels we instrument</strong>, and that is a proven proxy for
   campaign activity. We present this limitation explicitly rather than over-claiming.</p>
 </div>
 <p>The platform measures link exposure at four tiers, from already-implemented to future work:</p>
@@ -514,7 +514,7 @@ When the app is running, a suspicious SMS is additionally sent through the full 
 embedded keyword list still covers it. This is a deliberate trade-off: no headless background Dart isolate,
 at the cost of a shallower check while the app is closed.
 </p>
-<div class="callout">
+<div class="card honest">
 <p>
 <strong>Why iOS cannot do this.</strong> This is a structural platform restriction, not unfinished work. iOS
 gives no app the ability to read incoming SMS content, since <code>ILMessageFilterExtension</code> only sorts
@@ -561,7 +561,7 @@ supplied, the analyzer resolves it through the sender checker (§3) and adjusts 
   </tbody>
 </table>
 <p class="footnote">Table 5b. Sender trust resolution. Phone senders are normalized to the canonical <code>+970…</code> form before matching, so <code>0599…</code> and <code>00970…</code> resolve identically.</p>
-<div class="callout">
+<div class="card callout">
 <p>
 <strong>The spoofing exception: why “official” is not a free pass.</strong> SMS sender IDs are trivially
 forged; a scammer can put <code>JAWWAL</code> in the from-field. So the −25 reduction is
@@ -587,7 +587,7 @@ Text: <em>«مبروك! ربحت 10000 شيكل من جوال. لاستلام ا
     <tr><td>4</td><td>Request to transfer money up front</td><td>+</td></tr>
     <tr><td>5</td><td>OTP request: the code is secret and is never shared</td><td>+</td></tr>
     <tr><td>6</td><td>Embedded shortener <code>bit.ly/jwl-prize</code> routed through the URL engine</td><td>+</td></tr>
-    <tr><td>7</td><td>Sender resolves as <strong>official</strong>: but the message asks for an OTP, so the −25 is withheld</td><td><code>SPOOFING_WARNING</code></td></tr>
+    <tr><td>7</td><td>Sender resolves as <strong>official</strong>, but the message asks for an OTP, so the −25 is withheld</td><td><code>SPOOFING_WARNING</code></td></tr>
   </tbody>
 </table>
 <p class="footnote">Table 5c. Verdict: <strong>dangerous</strong>, score 100/100, categories PRIZE_SCAM · DELIVERY_SCAM · OTP_THEFT · BANK_PHISHING. Every one of these reasons is shown to the user in Arabic and English, so the verdict is never a bare number.</p>
@@ -695,7 +695,7 @@ failure:
   </tbody>
 </table>
 <p class="footnote">Table 5d. Moderation safeguards. The console lives at <code>/admin</code> and is deliberately absent from the site navigation; the token is held in <code>sessionStorage</code> so it expires with the tab unless the moderator opts into persistence.</p>
-<div class="callout">
+<div class="card honest">
 <p>
 <strong>An honest limitation.</strong> This is single-secret authentication, not user accounts: it identifies
 <em>a</em> moderator, not <em>which</em> moderator, and therefore supports no audit trail of who approved
@@ -756,7 +756,7 @@ answered by the evaluation below, which is still pending its corpus.
   </tbody>
 </table>
 <p class="footnote">Table 6. Evaluation metrics. Misclassified samples from each round feed back into rule weights (Figure 2 feedback edge).</p>
-<div class="callout">
+<div class="card honest">
 <p>
 <strong>Status: not yet measured.</strong> These are targets, not results. Reporting them as achievements
 before the labeled corpus exists would misrepresent the project. What <em>is</em> measured today is the
