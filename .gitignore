@@ -1,0 +1,22 @@
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
+.env
+backend/prisma/dev.db*
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+*.iml
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/ios/Flutter/Flutter.framework
+mobile/ios/Flutter/Flutter.podspec
+mobile/macos/Pods/
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/key.properties

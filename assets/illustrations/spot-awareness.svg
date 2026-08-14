@@ -1,0 +1,11 @@
+<svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Awareness and education">
+  <circle cx="80" cy="80" r="72" fill="#eaf5ee"/>
+  <path d="M80 58c-9-7-22-8-32-4v52c10-4 23-3 32 4 9-7 22-8 32-4V54c-10-4-23-3-32 4Z" fill="#ffffff" stroke="#14532d" stroke-width="3"/>
+  <path d="M80 58v52" stroke="#c7e4d2" stroke-width="3"/>
+  <path d="M56 66c6-2 12-2 17 1M56 78c6-2 12-2 17 1" stroke="#d9ede0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M104 66c-6-2-12-2-17 1M104 78c-6-2-12-2-17 1" stroke="#d9ede0" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="112" cy="44" r="15" fill="#f59e0b"/>
+  <path d="M112 38v6M112 44l4 4" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M106 56h12" stroke="#b45309" stroke-width="3" stroke-linecap="round"/>
+  <path d="M40 108l5 5-5 5-5-5z" fill="#1a6b3c"/>
+</svg>

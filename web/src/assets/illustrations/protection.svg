@@ -1,0 +1,9 @@
+<svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Real-time call and message protection">
+  <circle cx="80" cy="80" r="72" fill="#eaf5ee"/>
+  <rect x="52" y="34" width="72" height="104" rx="16" fill="#ffffff" stroke="#14532d" stroke-width="3" transform="rotate(-6 88 86)"/>
+  <rect x="62" y="52" width="52" height="70" rx="8" fill="#f8faf8" transform="rotate(-6 88 86)"/>
+  <path d="M62 100c0 30-21 44-31 48-10-4-31-18-31-48l31-10 31 10Z" fill="#2f9e5f" transform="translate(49 6)"/>
+  <path d="M74 110l-9 10-5-5" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M44 128l5 5-5 5-5-5z" fill="#ce1126"/>
+  <path d="M126 60l5 5-5 5-5-5z" fill="#1a6b3c"/>
+</svg>
