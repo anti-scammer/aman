@@ -1,30 +1,20 @@
-# Screenshots — أمان (Aman) Platform
+# Screenshots
 
-Captured 2026-07-03 from the running system (web: Chrome 1440px; mobile: Pixel 7 Pro emulator, Android 14, Arabic RTL locale).
+Captured from the running application on 2026-08-14 against seeded data.
 
-## Web application (React)
-
-| File | Page |
+| Source | How |
 |---|---|
-| `web-home.png` | Home — hero, live report statistics, feature cards, recently-flagged strip |
-| `web-check-url.png` | URL Checker — live result for `jawwal-prize.win/claim`: **dangerous 100/100** with explained reasons |
-| `web-check-social.png` | Social Account Checker |
-| `web-check-sender.png` | Sender / Caller Check |
-| `web-flagged.png` | Flagged-links public feed |
-| `web-reports.png` | Community reports search |
-| `web-awareness.png` | Awareness hub (articles) |
-| `web-quiz.png` | Interactive quiz |
+| `web-*.png` | Headless Chrome at 1440×900 @2x, driven with puppeteer-core against the Vite dev server and a live backend |
+| `mobile-*.png` | Pixel 7 Pro emulator (Android 14), `adb exec-out screencap` |
 
-## Mobile application (Flutter, Android)
+Everything shown is real output — verdicts, scores, reasons, and the moderation
+queue all come from the actual API, not mockups.
 
-| File | Screen |
-|---|---|
-| `mobile-home.png` | Home — report statistics and shortcuts |
-| `mobile-check.png` | Check tab (URL / Message / Social / Sender) |
-| `mobile-reports.png` | Reports tab (search / submit / flagged feed) |
-| `mobile-learn.png` | Awareness tab |
-| `mobile-protection.png` | **Real-time Protection** tab — consent card, call-screening / overlay / SMS permissions enabled, synced blocklist (5 numbers) |
-| `mobile-call-overlay.png` | **Live warning overlay** during a simulated incoming call from a community-reported number (`adb emu gsm call +970599123456`) — shows report count and scam category, call not blocked |
+`web-admin-gate` / `web-admin-queue` show the moderation console added in
+milestone 5. `mobile-call-overlay` is the native Android warning card.
 
-Regenerate the overlay shot: with the app installed and permissions granted, run
-`adb emu gsm call +970599123456` (see `mobile/README.md` for the full demo).
+Note: capturing the emulator requires software rendering — start it with
+`emulator -avd <name> -gpu swiftshader_indirect`, otherwise `screencap`
+returns blank frames because Flutter's surface is composited on the host GPU.
+
+Optimized JPEG copies for the demo site live in `../demo/img/`.

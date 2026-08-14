@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>أمان · Aman — Palestinian User Protection Platform from Digital Fraud</title>
+<meta name="description" content="Graduation project demo: an Arabic-first web and mobile platform that helps Palestinian users check suspicious links, messages, accounts, and callers before acting on them.">
+<style>
+  :root {
+    --brand-900: #0c3b20;
+    --brand-800: #12522c;
+    --brand-700: #175f34;
+    --brand-600: #1a6b3c;
+    --brand-300: #7fc79a;
+    --brand-200: #a8d8bb;
+    --brand-100: #d9efe2;
+    --brand-50:  #eef7f1;
+
+    --ink:       #14231a;
+    --ink-soft:  #4d5a52;
+    --ink-faint: #7d8a83;
+    --line:      #dfe8e2;
+    --bg:        #f6faf7;
+    --card:      #ffffff;
+
+    --safe:      #0b7d0b;
+    --warn:      #b45309;
+    --danger:    #c62828;
+
+    --r-sm: 8px;
+    --r-md: 14px;
+    --r-lg: 22px;
+    --shadow-sm: 0 1px 2px rgba(12,59,32,.06), 0 2px 8px rgba(12,59,32,.05);
+    --shadow-md: 0 4px 14px rgba(12,59,32,.09), 0 14px 40px rgba(12,59,32,.08);
+    --shadow-lg: 0 18px 50px rgba(12,59,32,.16);
+    --maxw: 1140px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 17px/1.65 ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 { line-height: 1.2; margin: 0; letter-spacing: -0.02em; }
+  p { margin: 0; }
+  img { max-width: 100%; display: block; }
+  a { color: var(--brand-700); }
+
+  .wrap { width: min(100% - 2.5rem, var(--maxw)); margin-inline: auto; }
+
+  .ar { font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif; }
+
+  /* ---------- header ---------- */
+  header.site {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(246,250,247,.86);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; gap: 1.25rem; padding: .8rem 0; }
+  .brand { display: flex; align-items: center; gap: .6rem; margin-inline-end: auto; text-decoration: none; color: inherit; }
+  .brand svg { width: 32px; height: 32px; flex: none; }
+  .brand b { font-size: 1.15rem; letter-spacing: -.02em; }
+  .brand span { display: block; font-size: .72rem; color: var(--ink-faint); font-weight: 500; letter-spacing: 0; }
+  .nav a.lnk { color: var(--ink-soft); text-decoration: none; font-size: .92rem; font-weight: 600; }
+  .nav a.lnk:hover { color: var(--brand-700); }
+  @media (max-width: 860px) { .nav a.lnk { display: none; } }
+
+  /* ---------- hero ---------- */
+  .hero {
+    background:
+      radial-gradient(1100px 520px at 78% -12%, rgba(127,199,154,.22), transparent 62%),
+      linear-gradient(178deg, var(--brand-900), var(--brand-800) 62%, #0e4526);
+    color: #eaf5ee;
+    padding: 5.5rem 0 5rem;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 26px 26px; opacity: .5;
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+    padding: .38rem 1rem; border-radius: 999px;
+    font-size: .82rem; font-weight: 600; color: #cfe8d9;
+  }
+  .hero h1 { font-size: clamp(2.3rem, 5.2vw, 3.9rem); margin: 1.4rem 0 .5rem; font-weight: 800; }
+  .hero .arname { font-size: clamp(1.6rem, 3.4vw, 2.3rem); color: var(--brand-300); font-weight: 700; margin-bottom: .3rem; }
+  .hero p.lede { font-size: clamp(1.03rem, 1.6vw, 1.22rem); color: #c8e0d3; max-width: 66ch; margin-top: 1rem; }
+  .hero .meta { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: .55rem; }
+  .pill {
+    background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16);
+    padding: .4rem .9rem; border-radius: 999px; font-size: .84rem; color: #d6ebdf; font-weight: 500;
+  }
+
+  /* ---------- stats ---------- */
+  .stats { background: var(--brand-900); border-top: 1px solid rgba(255,255,255,.09); padding: 2.2rem 0; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; text-align: center; }
+  .stat b { display: block; font-size: clamp(1.7rem, 3.4vw, 2.3rem); color: #fff; font-weight: 800; letter-spacing: -.03em; }
+  .stat span { font-size: .82rem; color: #9ec4ae; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+
+  /* ---------- sections ---------- */
+  section.band { padding: 4.5rem 0; }
+  section.band.alt { background: #fff; border-block: 1px solid var(--line); }
+
+  .sec-head { max-width: 60ch; margin-bottom: 2.6rem; }
+  .kicker {
+    font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--brand-600); margin-bottom: .7rem;
+  }
+  .sec-head h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 800; }
+  .sec-head p { color: var(--ink-soft); margin-top: .85rem; font-size: 1.05rem; }
+
+  /* feature rows */
+  .feature { display: grid; grid-template-columns: 1fr 1.25fr; gap: 3rem; align-items: center; margin-bottom: 4.5rem; }
+  .feature:last-child { margin-bottom: 0; }
+  .feature.flip .copy { order: 2; }
+  @media (max-width: 900px) {
+    .feature { grid-template-columns: 1fr; gap: 1.9rem; }
+    .feature.flip .copy { order: 0; }
+  }
+  .feature h3 { font-size: 1.45rem; font-weight: 750; margin-bottom: .7rem; }
+  .feature p { color: var(--ink-soft); }
+  .feature ul { margin: 1.1rem 0 0; padding: 0; list-style: none; display: grid; gap: .55rem; }
+  .feature li { position: relative; padding-inline-start: 1.6rem; color: var(--ink-soft); font-size: .96rem; }
+  .feature li::before {
+    content: ""; position: absolute; inset-inline-start: 0; top: .55em;
+    width: 7px; height: 7px; border-radius: 2px; background: var(--brand-300);
+  }
+  .tagrow { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.2rem; }
+  .tag {
+    font-size: .76rem; font-weight: 700; padding: .26rem .68rem; border-radius: 999px;
+    background: var(--brand-50); color: var(--brand-700); border: 1px solid var(--brand-100);
+  }
+  .tag.danger { background: #fdecec; color: var(--danger); border-color: #f7d3d3; }
+  .tag.warn   { background: #fdf3e4; color: var(--warn);   border-color: #f5e2c4; }
+
+  /* ---------- browser frame ---------- */
+  .browser {
+    border-radius: var(--r-lg); overflow: hidden; background: #fff;
+    box-shadow: var(--shadow-md); border: 1px solid var(--line);
+  }
+  .browser .bar {
+    display: flex; align-items: center; gap: .45rem;
+    padding: .62rem .9rem; background: #eef2ef; border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #cdd6d0; flex: none; }
+  .dot.r { background: #f0a9a4; } .dot.y { background: #f2ce8f; } .dot.g { background: #a6d6b3; }
+  .browser .url {
+    margin-inline-start: .55rem; flex: 1; background: #fff; border: 1px solid var(--line);
+    border-radius: 999px; padding: .2rem .8rem; font-size: .72rem; color: var(--ink-faint);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; overflow: hidden;
+  }
+  .shot-scroll { max-height: 620px; overflow-y: auto; overscroll-behavior: contain; }
+  .shot-scroll::-webkit-scrollbar { width: 9px; }
+  .shot-scroll::-webkit-scrollbar-thumb { background: #cdd8d1; border-radius: 999px; }
+
+  /* ---------- phone frame ---------- */
+  .phones { display: flex; gap: 1.6rem; flex-wrap: wrap; justify-content: center; }
+  .phone {
+    width: 250px; flex: none; border-radius: 30px; padding: 9px;
+    background: linear-gradient(160deg, #223028, #16211b);
+    box-shadow: var(--shadow-lg);
+  }
+  .phone .screen { border-radius: 22px; overflow: hidden; background: #fff; position: relative; }
+  .phone .notch {
+    position: absolute; top: 7px; left: 50%; transform: translateX(-50%);
+    width: 58px; height: 5px; border-radius: 999px; background: rgba(0,0,0,.32); z-index: 2;
+  }
+  .phone-cap { text-align: center; font-size: .82rem; color: var(--ink-faint); margin-top: .7rem; font-weight: 600; }
+
+  /* ---------- gallery grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.5rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md);
+    overflow: hidden; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+  }
+  .card .cap { padding: .95rem 1.1rem; border-top: 1px solid var(--line); }
+  .card .cap b { display: block; font-size: .95rem; }
+  .card .cap span { font-size: .84rem; color: var(--ink-faint); }
+  .card .thumb { height: 190px; overflow: hidden; background: var(--brand-50); }
+  .card .thumb img { width: 100%; object-fit: cover; object-position: top center; }
+
+  /* ---------- verdict legend ---------- */
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 1rem; margin-top: 2rem; }
+  .leg { border-radius: var(--r-md); padding: 1.1rem 1.25rem; border: 1px solid; }
+  .leg b { display: block; font-size: 1rem; margin-bottom: .2rem; }
+  .leg span { font-size: .87rem; opacity: .85; }
+  .leg.s { background: #ecf8ec; border-color: #c6e8c6; color: #0b6b0b; }
+  .leg.w { background: #fdf3e4; border-color: #f2ddbc; color: #96450a; }
+  .leg.d { background: #fdecec; border-color: #f5cfcf; color: #a91f1f; }
+
+  /* ---------- architecture ---------- */
+  .arch { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.2rem; }
+  .node {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--r-md);
+    padding: 1.4rem; box-shadow: var(--shadow-sm);
+  }
+  .node h4 { font-size: 1.02rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; }
+  .node .badge {
+    font-size: .66rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase;
+    background: var(--brand-800); color: #fff; padding: .16rem .5rem; border-radius: 5px;
+  }
+  .node ul { margin: 0; padding-inline-start: 1.1rem; color: var(--ink-soft); font-size: .9rem; }
+  .node li { margin-bottom: .28rem; }
+
+  /* ---------- note ---------- */
+  .note {
+    border-inline-start: 4px solid var(--brand-300);
+    background: var(--brand-50); padding: 1.3rem 1.5rem; border-radius: 0 var(--r-md) var(--r-md) 0;
+    color: var(--ink-soft); font-size: .97rem;
+  }
+  .note b { color: var(--ink); }
+
+  /* ---------- footer ---------- */
+  footer.site { background: var(--brand-900); color: #a9c9b7; padding: 3rem 0 2.2rem; font-size: .92rem; }
+  footer.site h4 { color: #fff; font-size: 1.05rem; margin-bottom: .6rem; }
+  .fgrid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 2.2rem; margin-bottom: 2.2rem; }
+  @media (max-width: 760px) { .fgrid { grid-template-columns: 1fr; } }
+  footer.site ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+  footer.site .rule { border-top: 1px solid rgba(255,255,255,.1); padding-top: 1.3rem; font-size: .84rem; color: #86a894; }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .87em;
+    background: var(--brand-50); border: 1px solid var(--brand-100);
+    padding: .08em .38em; border-radius: 5px; color: var(--brand-800);
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <defs><linearGradient id="sh" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#1a6b3c"/><stop offset="1" stop-color="#0c3b20"/>
+        </linearGradient></defs>
+        <path d="M24 3 L42 9.5 V23 C42 34.5 34.5 42.5 24 45.5 C13.5 42.5 6 34.5 6 23 V9.5 Z" fill="url(#sh)"/>
+        <path d="M24 36 C23 30 23 24 25.5 18.5" stroke="#e9f5ee" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M23.4 31.5 C19.5 31.5 17 29 16.5 25.5 C20.5 25.8 23 28 23.4 31.5 Z" fill="#7fc79a"/>
+        <path d="M23.6 31.5 C27.5 31 30 28.5 30.5 25 C26.5 25.4 24 27.8 23.6 31.5 Z" fill="#a8d8bb"/>
+        <path d="M23.5 25.5 C20 25.3 17.8 23 17.5 19.8 C21.2 20.2 23.3 22.3 23.5 25.5 Z" fill="#a8d8bb"/>
+        <path d="M24 25.3 C27.5 24.8 29.6 22.5 30 19.2 C26.3 19.8 24.3 22 24 25.3 Z" fill="#7fc79a"/>
+        <circle cx="25.8" cy="15.8" r="2.3" fill="#e9f5ee"/>
+      </svg>
+      <span style="display:block">
+        <b class="ar">أمان · Aman</b>
+        <span>Protection from digital fraud</span>
+      </span>
+    </a>
+    <a class="lnk" href="#detection">Detection</a>
+    <a class="lnk" href="#community">Community</a>
+    <a class="lnk" href="#moderation">Moderation</a>
+    <a class="lnk" href="#mobile">Mobile</a>
+    <a class="lnk" href="#architecture">Architecture</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<div class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Graduation project · 2026</span>
+    <div class="arname ar" style="margin-top:1.4rem">منصة حماية المستخدم الفلسطيني من الاحتيال الرقمي</div>
+    <h1>Check it before you trust it.</h1>
+    <p class="lede">
+      Palestinian internet users are targeted by fraud built specifically for the local context — fake Jawwal
+      prize draws, cloned Bank of Palestine and PalPay login pages, delivery-fee scams, and "official"
+      senders that are anything but. <strong style="color:#e8f5ed">Aman</strong> is an Arabic-first web and
+      mobile platform that lets anyone check a link, a message, an account, or a caller <em>before</em> acting
+      on it — and report what they find so the next person is warned.
+    </p>
+    <div class="meta">
+      <span class="pill">Arabic-first · full RTL</span>
+      <span class="pill">React + Vite</span>
+      <span class="pill">Node · Express · Prisma</span>
+      <span class="pill">Flutter + Android native</span>
+      <span class="pill">PostgreSQL · Docker</span>
+    </div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="wrap stats-grid">
+    <div class="stat"><b>4</b><span>Detection checkers</span></div>
+    <div class="stat"><b>151</b><span>Automated tests</span></div>
+    <div class="stat"><b>2</b><span>Languages, ar + en</span></div>
+    <div class="stat"><b>100%</b><span>On-device call screening</span></div>
+  </div>
+</div>
+
+<!-- ============ THE PROBLEM ============ -->
+<section class="band">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">The problem</div>
+      <h2>Generic scam filters don't speak the local language of fraud</h2>
+      <p>
+        International tools miss scams written in Palestinian Arabic, impersonating Palestinian brands, and
+        referencing Palestinian payment rails. There was no local, Arabic-first place to ask a simple
+        question: <em>is this safe?</em>
+      </p>
+    </div>
+
+    <div class="legend">
+      <div class="leg s"><b class="ar">آمن · Safe</b><span>No known fraud indicator found — which is not the same as trustworthy.</span></div>
+      <div class="leg w"><b class="ar">مشبوه · Suspicious</b><span>Some indicators present. Verify through an official channel first.</span></div>
+      <div class="leg d"><b class="ar">خطير · Dangerous</b><span>Strong indicators. Don't click, don't pay, don't share codes.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DETECTION ============ -->
+<section class="band alt" id="detection">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Detection</div>
+      <h2>Four checkers, one explainable verdict</h2>
+      <p>
+        Every check returns a 0–100 risk score and the <em>reasons</em> behind it, in Arabic and English.
+        Nothing is a black box — a user can see exactly which signal fired.
+      </p>
+    </div>
+
+    <!-- URL checker -->
+    <div class="feature">
+      <div class="copy">
+        <h3>URL checker</h3>
+        <p>
+          Local heuristics score a link before anyone visits it, then community reports and a
+          check-frequency signal are folded in — a URL suddenly being checked by many people is itself
+          evidence of an active campaign.
+        </p>
+        <ul>
+          <li>Lookalike domains for Palestinian brands (Levenshtein + substring)</li>
+          <li>Punycode, IP-literal hosts, and <code>@</code> credential tricks</li>
+          <li>Suspicious TLDs, URL shorteners, keyword stuffing</li>
+          <li>Missing or invalid HTTPS</li>
+        </ul>
+        <div class="tagrow">
+          <span class="tag danger">BRAND_LOOKALIKE</span>
+          <span class="tag danger">SUSPICIOUS_TLD</span>
+          <span class="tag warn">SCAM_KEYWORDS</span>
+        </div>
+      </div>
+      <div class="browser">
+        <div class="bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i>
+          <span class="url">aman.ps/check-url</span></div>
+        <img src="img/web-check-url.jpg" alt="URL checker showing a dangerous verdict, score 85, with three Arabic reasons for a fake Jawwal prize domain">
+      </div>
+    </div>
+
+    <!-- Message analyzer -->
+    <div class="feature flip">
+      <div class="copy">
+        <h3>Message analyzer — and why "official" senders still get flagged</h3>
+        <p>
+          A weighted Arabic/English rule engine scores SMS and WhatsApp text, extracts any links, and runs
+          them through the URL checker. Supplying the sender makes it sharper: a registered sender like
+          <code>JAWWAL</code> normally <em>reduces</em> the score by 25.
+        </p>
+        <p style="margin-top:.9rem">
+          But sender IDs are trivially spoofed. So when a message from an "official" sender asks for an OTP
+          or carries a dangerous link, that reduction is withheld and a
+          <strong>spoofing warning</strong> is raised instead — because a real bank never asks for your code.
+        </p>
+        <div class="tagrow">
+          <span class="tag">OFFICIAL_SENDER</span>
+          <span class="tag danger">SPOOFING_WARNING</span>
+          <span class="tag danger">OTP_THEFT</span>
+          <span class="tag danger">PRIZE_SCAM</span>
+        </div>
+      </div>
+      <div class="browser">
+        <div class="bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i>
+          <span class="url">aman.ps/analyze-message</span></div>
+        <div class="shot-scroll">
+          <img src="img/web-analyze-message.jpg" alt="Message analyzer: an Arabic prize scam claiming to be from JAWWAL scores 100 with a spoofing warning, five detected scam categories, and the embedded short link extracted">
+        </div>
+      </div>
+    </div>
+
+    <!-- Social + sender -->
+    <div class="feature">
+      <div class="copy">
+        <h3>Social accounts &amp; callers</h3>
+        <p>
+          The same explainable scoring applied to two more surfaces users get targeted through: fake brand
+          pages selling goods that never ship, and phone numbers behind prize-draw calls.
+        </p>
+        <ul>
+          <li>Handle impersonation, scam keywords, digit-suffix patterns (<code>jawwal.prizes2026</code>)</li>
+          <li>Platform detection across Facebook, Instagram, TikTok, Telegram, X, WhatsApp</li>
+          <li>A curated registry of genuine Palestinian senders — telecoms, banks, government</li>
+          <li>Phone normalization so <code>0599…</code>, <code>00970…</code> and <code>+970…</code> all match</li>
+        </ul>
+      </div>
+      <div>
+        <div class="browser" style="margin-bottom:1.2rem">
+          <div class="bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i>
+            <span class="url">aman.ps/check-social</span></div>
+          <img src="img/web-check-social.jpg" alt="Social account checker analyzing a fake Facebook page impersonating Jawwal">
+        </div>
+        <div class="browser">
+          <div class="bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i>
+            <span class="url">aman.ps/check-sender</span></div>
+          <img src="img/web-check-sender.jpg" alt="Sender checker confirming JAWWAL as an officially registered sender">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMMUNITY ============ -->
+<section class="band" id="community">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Community</div>
+      <h2>Every report makes the next check smarter</h2>
+      <p>
+        Reports are the platform's memory. A number reported by three people is flagged for everyone —
+        on the website, in the API, and in the phone blocklist the mobile app screens calls against.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="thumb"><img src="img/web-home.jpg" alt="Home page hero with live report statistics"></div>
+        <div class="cap"><b>Home</b><span>Live platform statistics from the reports database</span></div>
+      </div>
+      <div class="card">
+        <div class="thumb"><img src="img/web-reports.jpg" alt="Community report search results with type filters"></div>
+        <div class="cap"><b>Search reports</b><span>Normalized matching across phones, URLs, and accounts</span></div>
+      </div>
+      <div class="card">
+        <div class="thumb"><img src="img/web-submit-report.jpg" alt="Submit a scam report form"></div>
+        <div class="cap"><b>Submit a report</b><span>Optional name — anonymous reporting is the default</span></div>
+      </div>
+      <div class="card">
+        <div class="thumb"><img src="img/web-flagged.jpg" alt="Flagged links feed showing recently detected dangerous URLs"></div>
+        <div class="cap"><b>Flagged links</b><span>"Active scams right now", merged from checks and reports</span></div>
+      </div>
+      <div class="card">
+        <div class="thumb"><img src="img/web-awareness.jpg" alt="Awareness hub article list"></div>
+        <div class="cap"><b>Awareness hub</b><span>Six bilingual articles on locally targeted scams</span></div>
+      </div>
+      <div class="card">
+        <div class="thumb"><img src="img/web-quiz.jpg" alt="Interactive scam-recognition quiz"></div>
+        <div class="cap"><b>Quiz</b><span>Eight questions with per-answer explanations</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODERATION ============ -->
+<section class="band alt" id="moderation">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Moderation dashboard</div>
+      <h2>Nothing reaches the public unreviewed</h2>
+      <p>
+        Community data is only as good as its gatekeeping. Reports arrive as <code>PENDING</code> and are
+        invisible everywhere until a moderator publishes them — the queue below is the only path from a
+        submitted report to public search and the mobile blocklist.
+      </p>
+    </div>
+
+    <div class="feature">
+      <div class="copy">
+        <h3>Built to fail closed</h3>
+        <p>
+          The console is reached by URL and never linked from the site navigation. It is guarded by a
+          shared secret compared in constant time, and the API refuses to operate at all unless that
+          secret is configured — an unconfigured server rejects moderation rather than allowing it.
+        </p>
+        <ul>
+          <li>Token sent as a header, never in the URL where it would reach logs and history</li>
+          <li>Held in <code>sessionStorage</code> so it dies with the tab, unless "remember" is ticked</li>
+          <li>A rejected token is discarded immediately, so a bad secret can't loop</li>
+          <li>Queue is oldest-first, so no report starves</li>
+        </ul>
+        <div class="tagrow">
+          <span class="tag warn">PENDING</span>
+          <span class="tag">APPROVED</span>
+          <span class="tag danger">REJECTED</span>
+        </div>
+      </div>
+      <div class="browser">
+        <div class="bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i>
+          <span class="url">aman.ps/admin</span></div>
+        <div class="shot-scroll">
+          <img src="img/web-admin-queue.jpg" alt="Moderation console showing two pending reports with publish and reject actions, and status tabs counting 2 pending, 18 published, 0 rejected">
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>Why this matters more than it looks.</b> Approving a phone report doesn't just make it searchable —
+      it propagates into <code>/blocklist/phones</code>, which every mobile install syncs for offline call and
+      SMS screening. One moderator decision reaches every device.
+    </div>
+  </div>
+</section>
+
+<!-- ============ MOBILE ============ -->
+<section class="band" id="mobile">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Mobile</div>
+      <h2>The same platform, plus protection that runs while you don't</h2>
+      <p>
+        The Flutter app carries every checker from the web. On Android it adds something the web cannot do:
+        screening incoming calls and SMS as they arrive, entirely on the device.
+      </p>
+    </div>
+
+    <div class="phones" style="margin-bottom:3rem">
+      <div>
+        <div class="phone"><div class="screen"><i class="notch"></i>
+          <img src="img/mobile-home.jpg" alt="Mobile home screen with live report statistics in Arabic"></div></div>
+        <div class="phone-cap">Home</div>
+      </div>
+      <div>
+        <div class="phone"><div class="screen"><i class="notch"></i>
+          <img src="img/mobile-check-result.jpg" alt="Mobile URL check returning a dangerous verdict with score 95"></div></div>
+        <div class="phone-cap">Check · result</div>
+      </div>
+      <div>
+        <div class="phone"><div class="screen"><i class="notch"></i>
+          <img src="img/mobile-protection.jpg" alt="Real-time protection settings with call screening, overlay, and SMS monitoring enabled"></div></div>
+        <div class="phone-cap">Protection</div>
+      </div>
+      <div>
+        <div class="phone"><div class="screen"><i class="notch"></i>
+          <img src="img/mobile-learn.jpg" alt="Awareness articles in the mobile app"></div></div>
+        <div class="phone-cap">Learn</div>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="copy">
+        <h3>A warning the moment the phone rings</h3>
+        <p>
+          The app syncs the approved-report blocklist to the device, then matches every incoming call and
+          SMS against it natively — in Kotlin, without waking Dart. On a hit it draws a red bilingual
+          warning card over whatever is on screen.
+        </p>
+        <ul>
+          <li><strong>Nothing is uploaded.</strong> Calls and messages never leave the device</li>
+          <li><strong>Nothing is blocked.</strong> The user is warned; the decision stays theirs</li>
+          <li>Matching is digits-only with a last-9 fallback, so <code>0599…</code> matches <code>+970599…</code></li>
+          <li>Works with the app closed; falls back to a heads-up notification if the overlay can't draw</li>
+        </ul>
+      </div>
+      <div class="phones">
+        <div>
+          <div class="phone"><div class="screen"><i class="notch"></i>
+            <img src="img/mobile-call-overlay.jpg" alt="Red bilingual overlay warning card over a suspected scam call from +970599123456 with 3 community reports, categorized as a prize scam"></div></div>
+          <div class="phone-cap">Scam-call overlay</div>
+        </div>
+        <div>
+          <div class="phone"><div class="screen"><i class="notch"></i>
+            <img src="img/mobile-protection-synced.jpg" alt="Blocklist synced to the device showing 7 numbers and a sync timestamp"></div></div>
+          <div class="phone-cap">Blocklist synced on device</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:2.5rem">
+      <b>Why Android only — and why that is not a to-do item.</b> iOS structurally forbids this. No app can
+      read incoming SMS content (<code>ILMessageFilter</code> only sorts unknown senders into fixed folders,
+      never returning the text), draw over other apps, or learn that a call arrived — <code>CallKit</code>
+      matches a pre-supplied list that the system reads directly. The portable piece is that blocklist: iOS
+      could block matches <em>silently</em>, with no verdict, score, or explanation. It is documented as a
+      platform limitation, not left as unfinished work.
+    </div>
+  </div>
+</section>
+
+<!-- ============ BILINGUAL ============ -->
+<section class="band alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Arabic-first</div>
+      <h2>Not an English app that was translated</h2>
+      <p>
+        Arabic is the default and the layout is RTL from the ground up, built on CSS logical properties so
+        the entire interface mirrors correctly. English is a first-class toggle, not an afterthought —
+        and every analyzer reason ships in both languages.
+      </p>
+    </div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">
+      <div class="browser">
+        <div class="bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i>
+          <span class="url">aman.ps/check-url · العربية</span></div>
+        <img src="img/web-check-url.jpg" alt="URL checker in Arabic with a right-to-left layout">
+      </div>
+      <div class="browser">
+        <div class="bar"><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i>
+          <span class="url">aman.ps/check-url · English</span></div>
+        <img src="img/web-check-url-en.jpg" alt="The same URL checker in English with a left-to-right layout">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section class="band" id="architecture">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Architecture</div>
+      <h2>One API, three clients, no vendor lock-in</h2>
+      <p>
+        Detection runs server-side so the rules improve for every client at once — with an optional local
+        LLM as a bounded second opinion that can never override the rules.
+      </p>
+    </div>
+
+    <div class="arch">
+      <div class="node">
+        <h4><span class="badge">Web</span> React + Vite</h4>
+        <ul>
+          <li>TypeScript, React Router</li>
+          <li>12 routes incl. the moderation console</li>
+          <li>Arabic-first RTL, ar/en toggle</li>
+          <li>52 tests — vitest + testing-library</li>
+        </ul>
+      </div>
+      <div class="node">
+        <h4><span class="badge">API</span> Node + Express</h4>
+        <ul>
+          <li>Prisma ORM, Zod validation</li>
+          <li>Rule engines for URL, message, social, sender</li>
+          <li>Token-guarded moderation that fails closed</li>
+          <li>85 tests — vitest</li>
+        </ul>
+      </div>
+      <div class="node">
+        <h4><span class="badge">Mobile</span> Flutter + Kotlin</h4>
+        <ul>
+          <li>Shared API client, same verdicts</li>
+          <li>Native call screening, SMS receiver, overlay</li>
+          <li>On-device blocklist store</li>
+          <li>14 tests — flutter test</li>
+        </ul>
+      </div>
+      <div class="node">
+        <h4><span class="badge">Data</span> SQLite → PostgreSQL</h4>
+        <ul>
+          <li>SQLite in development, zero setup</li>
+          <li>PostgreSQL in production via Docker</li>
+          <li>Migrations applied before serving traffic</li>
+          <li>nginx serves the SPA and proxies the API</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:2.2rem">
+      <b>The optional LLM is deliberately on a leash.</b> When a local Ollama model is reachable it gives a
+      second opinion, but it can only move the score by ±25 and can never push a message the rules scored
+      dangerous back below suspicious. If it is unreachable, times out, or returns malformed output, the
+      analysis silently falls back to rules alone. No network dependency, no data leaving the machine.
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site">
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <h4 class="ar">أمان · Aman</h4>
+        <p>
+          A graduation project — a free, Arabic-first platform helping Palestinian users recognize and
+          report digital fraud. Every screenshot on this page is from the running application.
+        </p>
+      </div>
+      <div>
+        <h4>Platform</h4>
+        <ul>
+          <li>URL checker</li>
+          <li>Message analyzer</li>
+          <li>Social account checker</li>
+          <li>Sender &amp; caller checker</li>
+          <li>Community reports</li>
+          <li>Awareness hub</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Engineering</h4>
+        <ul>
+          <li>151 automated tests</li>
+          <li>Docker + PostgreSQL</li>
+          <li>Bilingual ar/en throughout</li>
+          <li>Android real-time protection</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rule">
+      Verdicts are produced by heuristics and pattern rules, not certainty. A "safe" result means no known
+      fraud indicator was found — never that something is trustworthy. · مشروع تخرج ٢٠٢٦
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
