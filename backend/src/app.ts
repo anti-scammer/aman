@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import adminRouter from './routes/admin';
 import blocklistRouter from './routes/blocklist';
 import checkRouter from './routes/check';
 import { articlesRouter, quizRouter } from './routes/content';
@@ -23,6 +24,7 @@ export function createApp() {
   api.use('/blocklist', blocklistRouter);
   api.use('/articles', articlesRouter);
   api.use('/quiz', quizRouter);
+  api.use('/admin', adminRouter); // token-guarded moderation (§4.5)
 
   app.use('/api', api);
 

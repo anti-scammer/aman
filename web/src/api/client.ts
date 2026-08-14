@@ -358,3 +358,65 @@ export function getArticle(slug: string): Promise<Article> {
 export function getQuiz(): Promise<QuizQuestion[]> {
   return request<QuizQuestion[]>('/quiz')
 }
+
+// ---------------------------------------------------------------------------
+// §4.5 Moderation (admin) — every call carries the shared secret as a header.
+// ---------------------------------------------------------------------------
+
+/** A report as seen by a moderator: includes status and the normalized value. */
+export interface AdminReport extends Report {
+  normalizedValue: string
+}
+
+export interface AdminQueueResult {
+  items: AdminReport[]
+  page: number
+  totalPages?: number
+  pageSize?: number
+  total: number
+}
+
+export interface AdminStats {
+  byStatus: Record<ReportStatus, number>
+  pendingByType: Record<ReportType, number>
+  total: number
+}
+
+function adminHeaders(token: string): HeadersInit {
+  return { 'x-admin-token': token }
+}
+
+export async function getAdminReports(
+  token: string,
+  params: { status?: ReportStatus; type?: ReportType; page?: number } = {}
+): Promise<AdminQueueResult> {
+  const qs = new URLSearchParams()
+  if (params.status) qs.set('status', params.status)
+  if (params.type) qs.set('type', params.type)
+  qs.set('page', String(params.page ?? 1))
+  return withTotalPages(
+    await request<AdminQueueResult>(`/admin/reports?${qs.toString()}`, {
+      headers: adminHeaders(token),
+    })
+  )
+}
+
+export function getAdminStats(token: string): Promise<AdminStats> {
+  return request<AdminStats>('/admin/stats', { headers: adminHeaders(token) })
+}
+
+/** Approve or reject a report. Approving is what makes it publicly visible. */
+export function moderateReport(
+  token: string,
+  id: string,
+  status: 'APPROVED' | 'REJECTED'
+): Promise<AdminReport & { previousStatus: ReportStatus }> {
+  return request<AdminReport & { previousStatus: ReportStatus }>(
+    `/admin/reports/${encodeURIComponent(id)}`,
+    {
+      method: 'PATCH',
+      headers: adminHeaders(token),
+      body: JSON.stringify({ status }),
+    }
+  )
+}

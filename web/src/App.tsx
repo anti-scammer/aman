@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { LanguageProvider } from './i18n/LanguageContext'
+import { Admin } from './pages/Admin'
 import { ArticlePage } from './pages/ArticlePage'
 import { Awareness } from './pages/Awareness'
 import { FlaggedLinks } from './pages/FlaggedLinks'
@@ -30,6 +31,8 @@ export default function App() {
             <Route path="/awareness" element={<Awareness />} />
             <Route path="/awareness/:slug" element={<ArticlePage />} />
             <Route path="/quiz" element={<QuizPage />} />
+            {/* Moderator-only; intentionally absent from the site navigation. */}
+            <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
