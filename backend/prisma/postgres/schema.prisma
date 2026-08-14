@@ -1,0 +1,75 @@
+// Prisma schema — PRODUCTION (PostgreSQL).
+//
+// Why a second schema file: Prisma does not allow the datasource `provider` to
+// come from an env var, so a project that runs SQLite in development and
+// PostgreSQL in production needs one schema per provider. The models below
+// must stay in sync with ../schema.prisma — that file is the development
+// source of truth; this one only changes the datasource and adds native
+// PostgreSQL types where they help.
+//
+// Used by the Docker image:
+//   prisma migrate deploy --schema=prisma/postgres/schema.prisma
+//   prisma generate       --schema=prisma/postgres/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Community scam reports (PHONE | URL | SOCIAL_ACCOUNT)
+model Report {
+  id              String   @id @default(cuid())
+  type            String // PHONE | URL | SOCIAL_ACCOUNT
+  value           String
+  normalizedValue String
+  description     String
+  scamCategory    String // see §6 shared enum
+  reporterName    String?
+  status          String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  createdAt       DateTime @default(now())
+
+  @@index([normalizedValue])
+  @@index([status, type])
+}
+
+// Awareness Hub articles (bilingual, markdown bodies)
+model Article {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  titleAr   String
+  titleEn   String
+  summaryAr String
+  summaryEn String
+  bodyAr    String
+  bodyEn    String
+  category  String // scam category the article covers
+  createdAt DateTime @default(now())
+}
+
+// Awareness Hub quiz
+model QuizQuestion {
+  id              String @id @default(cuid())
+  questionAr      String
+  questionEn      String
+  optionsJson     String // JSON: [{ id, textAr, textEn }]
+  correctOptionId String
+  explanationAr   String
+  explanationEn   String
+}
+
+// Analytics + flagged-links feed: every URL/message check is logged here.
+model CheckLog {
+  id              String   @id @default(cuid())
+  kind            String // URL | MESSAGE
+  normalizedValue String // normalized URL (or message fingerprint)
+  verdict         String // safe | suspicious | dangerous
+  score           Int
+  createdAt       DateTime @default(now())
+
+  @@index([normalizedValue])
+  @@index([kind, verdict, createdAt])
+}

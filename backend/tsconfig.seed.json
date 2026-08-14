@@ -1,0 +1,13 @@
+// Compiles the seed script (and the src modules it imports) to dist-seed/, so
+// the production image can run `node dist-seed/prisma/seed.js` without needing
+// tsx — the main build (tsconfig.json) is rooted at src/ and excludes prisma/.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist-seed",
+    "sourceMap": false
+  },
+  "include": ["prisma/seed.ts", "src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "dist-seed", "tests"]
+}

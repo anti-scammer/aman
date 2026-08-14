@@ -1,0 +1,9 @@
+node_modules
+dist
+dist-seed
+tests
+*.log
+.env
+.DS_Store
+prisma/dev.db
+prisma/dev.db-journal

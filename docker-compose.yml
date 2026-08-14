@@ -1,0 +1,63 @@
+# Production-shaped stack: PostgreSQL + backend + nginx-served web app.
+#
+#   cp .env.docker.example .env
+#   # edit .env — at minimum set POSTGRES_PASSWORD and ADMIN_TOKEN
+#   docker compose up --build
+#
+# Then: web http://localhost:8080  ·  API http://localhost:8080/api/health
+#       moderation console http://localhost:8080/admin
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-antiscammer}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-antiscammer}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      # The backend must not run migrations before Postgres accepts queries.
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-antiscammer} -d ${POSTGRES_DB:-antiscammer}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-antiscammer}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-antiscammer}?schema=public
+      PORT: 3000
+      # Without this the moderation API stays disabled and reports can never
+      # be approved. Must be at least 16 characters.
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN in .env}
+      # Seed awareness articles, quiz, and sample reports on first boot.
+      SEED_ON_START: ${SEED_ON_START:-true}
+      # Optional local-LLM second opinion; "false" keeps it off in Docker
+      # since Ollama runs outside this network by default.
+      LLM_ENABLED: ${LLM_ENABLED:-false}
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+    expose:
+      - '3000'
+
+  web:
+    build:
+      context: ./web
+      args:
+        # Relative base: nginx in this container proxies /api to the backend.
+        VITE_API_URL: /api
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '${WEB_PORT:-8080}:80'
+
+volumes:
+  db-data:
