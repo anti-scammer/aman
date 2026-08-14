@@ -151,19 +151,21 @@
 <!-- ================================================================ -->
 <h2 id="intro"><span class="no">1.</span>Introduction</h2>
 <p>
-Digital fraud against Palestinian users was relatively limited before the war on Gaza, but it has grown
-sharply during and since it: fake prize draws impersonating telecom operators (Jawwal, Ooredoo), phishing
-pages imitating local banks and e-wallets (Bank of Palestine, PalPay, Jawwal Pay, Reflect), fake delivery-fee
-requests, fraudulent job offers, and fake donation campaigns exploiting the humanitarian situation. Victims
-lose money, credentials, and accounts, and today there is <strong>no local, Arabic-first tool</strong> where a
-Palestinian user can check a suspicious link or message before acting on it, or look up whether a phone
-number or page has already been reported as a scam.
+Online fraud was not a large problem for Palestinians before the war on Gaza. It has grown a great deal
+during it and since. The messages take familiar shapes: a prize draw from Jawwal or Ooredoo that you never
+entered, a login page that looks exactly like Bank of Palestine or PalPay or Jawwal Pay or Reflect, a small
+delivery fee standing between you and a parcel, a job abroad that asks for money up front, a donation appeal
+that trades on what people here are living through. People lose money, passwords and whole accounts to these.
+And when a message arrives and something about it feels wrong, there is
+<strong>nowhere local, and nothing in Arabic</strong>, to ask before you tap: is this real, and has anyone
+reported this number before?
 </p>
 <p>
-This project builds that tool: a <strong>web + mobile platform</strong> that (a) analyzes suspicious links and
-messages and returns an explained risk verdict, (b) hosts a community database of reported scam numbers,
-links, and accounts, (c) publishes a live feed of flagged links, and (d) provides localized awareness content
-and quizzes. The platform is Arabic-first with full English support.
+This project builds that tool. It is a <strong>website and a mobile app</strong> that looks at a suspicious
+link or message and tells you how risky it is and why. It keeps a database of scam numbers, links and
+accounts that people have reported, so anyone can search before trusting a contact. It publishes a running
+feed of the links being flagged right now. And it explains, in articles and a short quiz, how these scams
+work. Arabic comes first throughout, with full English alongside it.
 </p>
 
 <!-- ================================================================ -->
@@ -210,21 +212,22 @@ of phishing campaigns, and 7amleh [10] documents the Palestinian digital-safety 
 <h2 id="idea"><span class="no">3.</span>The Idea</h2>
 <p>One platform, six protective functions, available as a website and a mobile app:</p>
 <div class="grid">
-  <div class="card"><h4>1 · URL Checker</h4><p>Paste any link → multi-signal analysis → verdict (<em>safe / suspicious / dangerous</em>) with human-readable reasons in Arabic and English.</p></div>
-  <div class="card"><h4>2 · Message Analyzer</h4><p>Paste an SMS/WhatsApp text → bilingual scam-pattern engine detects prize, delivery, job, OTP and bank-phishing scams; embedded links are auto-extracted and checked. Optionally sender-aware (§9).</p></div>
-  <div class="card"><h4>3 · Social Account Checker</h4><p>Paste a profile URL or bare <code>@handle</code> → platform detection plus brand-impersonation scoring (Levenshtein and substring matching against the Palestinian brand list), scam keywords, and the digit-suffix pattern typical of cloned pages.</p></div>
-  <div class="card"><h4>4 · Sender / Caller Checker</h4><p>Look up a phone number or SMS sender ID against a curated registry of genuine Palestinian senders (telecoms, banks, government) and the community report database → <em>official / reported / unknown</em>.</p></div>
-  <div class="card"><h4>5 · Community Reports</h4><p>Users report scam phone numbers, links, and social accounts. Everyone can search the registry before trusting a contact. Reports feed back into URL scoring, once moderation (§11) approves them.</p></div>
-  <div class="card"><h4>6 · Awareness Hub + Flagged Feed</h4><p>Localized articles and quizzes, plus a public live feed of links the platform has recently flagged: “what scams are active right now.”</p></div>
+  <div class="card"><h4>1 · URL Checker</h4><p>Paste in a link and we tell you whether it looks <em>safe, suspicious or dangerous</em>, and list the reasons in Arabic or English so you can judge for yourself.</p></div>
+  <div class="card"><h4>2 · Message Analyzer</h4><p>Paste the text of an SMS or WhatsApp message. We read it in Arabic or English, recognise the common scams (prizes, delivery fees, job offers, verification codes, fake bank warnings) and check any link inside it. Tell us who sent it and we take that into account too (§9).</p></div>
+  <div class="card"><h4>3 · Social Account Checker</h4><p>Give us a profile link or just an <code>@handle</code>. We work out which platform it belongs to and look for the marks of a copied page: a name almost but not quite like a real company, scam wording, or the numbers tacked on the end that cloned accounts tend to have.</p></div>
+  <div class="card"><h4>4 · Sender / Caller Checker</h4><p>Look up a phone number or the name a text came from. We check it against a list of the real Palestinian senders (the telecoms, the banks, government bodies) and against what people have reported, and tell you whether it is <em>official</em>, <em>already reported</em>, or simply <em>unknown to us</em>.</p></div>
+  <div class="card"><h4>5 · Community Reports</h4><p>Anyone can report a scam number, link or account, and anyone can search what has been reported before trusting a contact. Once a moderator approves a report (§11) it starts raising the score for everyone else who checks the same thing.</p></div>
+  <div class="card"><h4>6 · Awareness Hub + Flagged Feed</h4><p>Short articles and a quiz about the scams that actually circulate here, next to a live list of the links we have flagged recently, so you can see what is going around this week.</p></div>
 </div>
 <p>
-On Android the mobile app adds a seventh function that a website structurally cannot provide:
-<strong>real-time protection</strong>: screening incoming calls and SMS against the community blocklist
-as they arrive, entirely on the device (§8.1).
+The Android app does one more thing a website simply cannot do. It watches incoming calls and text
+messages as they arrive and checks them against the community blocklist, all on the phone itself. We call
+this <strong>real-time protection</strong>, and §8.1 explains how it works.
 </p>
 <p>
-The system creates a <strong>feedback loop</strong>: every check and every report makes the next check smarter: community reports raise the risk score of matching URLs, and unusually frequent checks of the same URL signal
-an active campaign.
+These parts feed each other. Every check and every report makes the next check a little sharper: a reported
+link scores higher for the next person who pastes it, and a link suddenly being checked by a lot of people
+tells us a campaign is underway.
 </p>
 
 <!-- ================================================================ -->
@@ -261,8 +264,9 @@ flowchart TB
 <!-- ================================================================ -->
 <h2 id="method"><span class="no">5.</span>Methodology</h2>
 <p>
-We follow a <strong>design-science / incremental development methodology</strong>: build the artifact in small
-verified increments, evaluate it against a labeled dataset and real users, and iterate.
+We built the system in small pieces, testing each one before moving on, then checked it against collected
+scam samples and real users and went back round again. In research terms this is design science with
+incremental development.
 </p>
 <figure class="diagram">
 <pre class="mermaid">
@@ -295,8 +299,11 @@ flowchart LR
   <p style="margin:0">“How will you decide whether a link is suspicious?”</p>
 </div>
 <p>
-A URL is never judged by one signal. The engine evaluates <strong>independent weighted signals</strong> from three families, namely lexical (the URL text itself), transport (encryption), and community (our own database), and combines them into a 0–100 risk score. This mirrors the feature families proven effective in the
-literature [5][7], implemented as transparent rules so every verdict can be <em>explained to the user</em>.
+No single clue is enough on its own, so the engine looks at three kinds at once: what the link itself says,
+whether it is encrypted, and what our community has already reported about it. Each clue that fires adds to
+a score out of 100. These are the same families of clues the research literature found effective [5][7], but
+we wrote them as plain rules rather than a trained model, so we can always <em>tell the user why</em> we
+reached a verdict.
 </p>
 
 <h3>6.1 Detection signals and weights</h3>
@@ -409,11 +416,11 @@ sequenceDiagram
   <p style="margin:0">“How will you know the number of people who visited a specific link?”</p>
 </div>
 <div class="card honest">
-  <p style="margin:0"><strong>Honest scientific answer first:</strong> no third party can measure the true global
-  visit count of an arbitrary external URL. Only the site's owner (or its DNS/hosting provider) has that data.
-  None of the established systems [1–4] rely on such a number either. What we <em>can</em> measure, rigorously,
-  is the link's <strong>observed spread through channels we instrument</strong>, and that is a proven proxy for
-  campaign activity. We present this limitation explicitly rather than over-claiming.</p>
+  <p style="margin:0"><strong>The honest answer first:</strong> nobody outside a website can tell you how many
+  people really visited it. Only the site's owner, or whoever runs its hosting and DNS, holds that number, and
+  none of the established systems [1–4] claim otherwise. What we <em>can</em> count, and count properly, is how
+  far a link has spread <strong>through the places we can see</strong>, which is a well-established stand-in for
+  how active a campaign is. We would rather say that plainly than promise a number we cannot produce.</p>
 </div>
 <p>The platform measures link exposure at four tiers, from already-implemented to future work:</p>
 <table>
@@ -452,11 +459,12 @@ sequenceDiagram
   <p style="margin:0">“How will you monitor the users who visited the links?”</p>
 </div>
 <p>
-<strong>We deliberately do not monitor individuals. The platform is designed so that it cannot.</strong>
-Tracking what specific people visit would itself be surveillance: it would violate the privacy of the very
-users we protect, and unauthorized interception/monitoring is prohibited under the Palestinian Cybercrime
-Law by Decree No. 10 of 2018 [11]. It would also destroy user trust, which a community-reporting platform
-depends on. Instead, all metrics in §7 are <strong>anonymous and aggregate by construction</strong>:
+<strong>We do not monitor individuals, and we built the platform so that we could not even if we wanted
+to.</strong> Following what particular people click would be surveillance, plain and simple. It would invade
+the privacy of the very people we set out to protect, and intercepting or monitoring someone's communications
+without authorisation is against the Palestinian Cybercrime Law by Decree No. 10 of 2018 [11]. It would also
+cost us the trust that a community-reporting platform lives on. So every figure in §7 is
+<strong>anonymous and aggregated from the start</strong>:
 </p>
 <table>
   <thead><tr><th>We store (per event)</th><th>We never store</th></tr></thead>
@@ -469,18 +477,19 @@ depends on. Instead, all metrics in §7 are <strong>anonymous and aggregate by c
 </table>
 <p class="footnote">Table 4. Privacy-by-design data policy. No login is required to check a link or search reports; reporters may optionally leave a display name.</p>
 <p>
-For the future browser extension (Tier D), the Safe Browsing k-anonymity model [1] applies: the extension
-hashes each visited URL locally and sends only a short hash <em>prefix</em>; the server returns candidate
-matches and the final comparison happens on the device. The server therefore learns that <em>someone</em>
-encountered a flagged link, never <em>who</em>, and never the rest of their browsing.
+The browser extension we plan for later would follow the same approach Google uses for Safe Browsing [1].
+The extension scrambles each address you visit and sends only a short fragment of the result. The server
+sends back the handful of entries that might match, and the final comparison happens inside your own browser.
+All the server ever learns is that <em>somebody</em> ran into a flagged link. It never learns who, and it
+never sees the rest of your browsing.
 </p>
 
 <h3>8.1 What we built instead: on-device real-time protection</h3>
 <p>
-The implemented answer to “how do you protect people at the moment of the attack, without watching them?”
-is to move the check <em>to the device</em>. The Android app screens every incoming call and SMS against
-the community blocklist and shows a warning overlay on a match, and the entire comparison happens locally,
-in native code, with no network round trip.
+So how do you warn someone at the moment the scam reaches them, without watching what they do? Our answer
+was to move the check onto the phone. The Android app compares every incoming call and message against the
+community blocklist and shows a red warning card when one matches. That comparison happens in native code on
+the device, and nothing is sent anywhere to make it.
 </p>
 <figure class="diagram">
 <pre class="mermaid">
@@ -501,38 +510,40 @@ sequenceDiagram
 <figcaption>Figure 5b. On-device screening. The blocklist flows one way (server → device). Calls, messages, and matches never flow back, so the platform cannot know who was contacted by whom.</figcaption>
 </figure>
 <p>
-Three properties make this compatible with the privacy stance above rather than a contradiction of it:
+At first glance this sounds like the surveillance we just ruled out. It is not, for three reasons:
 </p>
 <ul>
-  <li><strong>Nothing is uploaded.</strong> Call numbers and message bodies are matched on the device and never transmitted. The server only ever serves a public blocklist; it receives no telemetry in return.</li>
-  <li><strong>Nothing is blocked.</strong> The call-screening service always responds “allow”. The user is warned and decides. The platform never silently intervenes in someone's communications, which also keeps it clear of the interception prohibitions in the Cybercrime Law [11].</li>
-  <li><strong>The list is public.</strong> The blocklist is built only from <em>approved</em> community reports (§11), so nothing on a device came from surveillance. It came from people who chose to report.</li>
+  <li><strong>Nothing leaves the phone.</strong> The number that is calling and the words in the message are compared on the device and never sent anywhere. The server hands out a public list; it gets nothing back.</li>
+  <li><strong>No call is ever blocked.</strong> The app always lets the call through and simply shows a warning. The person decides what to do with it. We never step into someone's calls or messages on their behalf, which also keeps us well clear of the interception rules in the Cybercrime Law [11].</li>
+  <li><strong>The list is public.</strong> Every number on it came from a community report that a moderator approved (§11). Nothing on anyone's phone was gathered by watching them; it was put there by people who chose to speak up.</li>
 </ul>
 <p>
-When the app is running, a suspicious SMS is additionally sent through the full analyzer
-(<code>POST /analyze-message</code>) for an explained verdict; when it is not, the native blocklist plus a small
-embedded keyword list still covers it. This is a deliberate trade-off: no headless background Dart isolate,
-at the cost of a shallower check while the app is closed.
+If the app happens to be open when a suspicious message arrives, it also runs the text through the full
+analyzer (<code>POST /analyze-message</code>) so the user gets the reasons, not just a warning. If the app is
+closed, the blocklist and a short built-in keyword list still catch the obvious cases. We chose not to keep a
+background process alive purely to close that gap, and accepted a shallower check while the app is shut.
 </p>
 <div class="card honest">
 <p>
-<strong>Why iOS cannot do this.</strong> This is a structural platform restriction, not unfinished work. iOS
-gives no app the ability to read incoming SMS content, since <code>ILMessageFilterExtension</code> only sorts
-messages from unknown senders into fixed folders, never returning the text or permitting a per-message server
-call; to draw over other applications; or to observe that a call arrived at all, because <code>CallKit</code> matches
-a list the app supplies in advance, which the system reads directly. The portable fragment is that list: an
-iOS extension could publish approved numbers and let the system block matches <em>silently</em>, with no
-verdict, score, reasons, or overlay. The app therefore returns <code>false</code> for protection support on
-every non-Android platform and explains the limitation in the interface instead of failing.
+<strong>Why we could not build this for iPhone.</strong> This is something Apple does not allow any app to
+do, so no amount of extra work would get us there. iOS will not let an app read the text of an incoming
+message: <code>ILMessageFilterExtension</code> can only sort messages from unknown senders into fixed folders,
+and it never hands the text to the app or lets it ask a server about one. iOS will not let an app draw a
+warning on top of whatever the user is looking at. And it will not even tell an app that a call came in:
+<code>CallKit</code> checks a list the app hands over in advance, and the system reads that list itself.
+The one piece that would carry over is the list. An iOS version could hand Apple the approved numbers and
+let the phone block them quietly, but the user would get no score, no reasons and no warning card, just a
+call that never rings. Rather than ship something half-working, the app reports that protection is
+unavailable on anything other than Android and explains why on screen.
 </p>
 </div>
 
 <!-- ================================================================ -->
 <h2 id="messages"><span class="no">9.</span>Message (SMS/WhatsApp) Analysis</h2>
 <p>
-Scams reach Palestinians mostly as <em>messages</em>, not bare links. The message analyzer applies a weighted
-bilingual rule engine over the text, then extracts any embedded URLs and runs each through the URL engine
-(§6), folding the results into one verdict.
+Most scams arrive as a <em>message</em> rather than a bare link, usually by SMS or WhatsApp. The analyzer
+reads the text in Arabic and English, pulls out any links it finds and sends those through the URL engine
+(§6), then brings everything back into a single verdict.
 </p>
 <table>
   <thead><tr><th>Category</th><th>Arabic patterns (examples)</th><th>English patterns (examples)</th></tr></thead>
@@ -549,8 +560,8 @@ bilingual rule engine over the text, then extracts any embedded URLs and runs ea
 
 <h3>9.1 Sender-aware analysis</h3>
 <p>
-A message is not just its text. Who it came from matters. When the optional <code>sender</code> field is
-supplied, the analyzer resolves it through the sender checker (§3) and adjusts the score:
+Who a message came from tells you almost as much as what it says. If the user fills in the optional
+<code>sender</code> field, the analyzer looks that sender up (§3) and adjusts the score:
 </p>
 <table>
   <thead><tr><th>Sender trust</th><th>Resolved from</th><th>Effect on score</th><th>Reason code</th></tr></thead>
@@ -563,13 +574,14 @@ supplied, the analyzer resolves it through the sender checker (§3) and adjusts 
 <p class="footnote">Table 5b. Sender trust resolution. Phone senders are normalized to the canonical <code>+970…</code> form before matching, so <code>0599…</code> and <code>00970…</code> resolve identically.</p>
 <div class="card callout">
 <p>
-<strong>The spoofing exception: why “official” is not a free pass.</strong> SMS sender IDs are trivially
-forged; a scammer can put <code>JAWWAL</code> in the from-field. So the −25 reduction is
-<em>withheld</em>, and a <code>SPOOFING_WARNING</code> reason is raised instead, whenever a message from a
-supposedly official sender also asks for an OTP or credentials, or carries a link the URL engine rated
-dangerous. The reasoning is domain knowledge, not statistics: <strong>a real bank or telecom never asks for
-your verification code</strong>, so a message that does either is not from them or is not to be trusted, and in both cases the impersonation makes it <em>more</em> dangerous, not less. Without this rule the
-sender field would be a vulnerability: attackers would simply spoof their way to a lower score.
+<strong>Why a trusted sender does not earn a free pass.</strong> Sender names are easy to fake. Anyone can
+put <code>JAWWAL</code> in the from-field of a text message. So we hold back the −25 and raise a
+<code>SPOOFING_WARNING</code> instead whenever a message from a supposedly official sender also asks for a
+verification code or your login details, or carries a link we rated dangerous. This comes from knowing the
+domain rather than from any statistic: <strong>a real bank or telecom will never ask you for your
+verification code</strong>. If a message does, either it is not from them or it should not be trusted, and
+either way the fact that it is wearing their name makes it worse, not better. Without this rule, faking a
+trusted name would be the easiest way to get a lower score.
 </p>
 </div>
 
@@ -594,20 +606,19 @@ Text: <em>«مبروك! ربحت 10000 شيكل من جوال. لاستلام ا
 
 <h3>9.3 Optional local-LLM second opinion</h3>
 <p>
-Rule engines are precise but literal: they miss rephrasings they were never taught. The analyzer can
-therefore consult a <strong>local</strong> large language model (Ollama) as a second opinion, deliberately
-kept on a short leash:
+Rules are reliable but literal. They catch the wordings we taught them and miss the ones we did not think
+of. To help with that, the analyzer can ask a <strong>local</strong> language model (Ollama) for a second
+opinion, on a short leash:
 </p>
 <ul>
-  <li><strong>Rules run first and always.</strong> The LLM never produces the base score; it can only adjust one that already exists, by <code>round(±confidence × 25)</code> at most.</li>
-  <li><strong>It cannot exonerate.</strong> A message the rules scored ≥ 60 is clamped at ≥ 35, so the model can never talk a dangerous message down below <em>suspicious</em>.</li>
-  <li><strong>It cannot break the service.</strong> Unreachable, timed out (12 s), or malformed output all fall back silently to rules-only analysis.</li>
-  <li><strong>It is local.</strong> The model runs on the operator's own machine; no message text is sent to any third party. Disabled by default in the Docker stack.</li>
+  <li><strong>The rules always run first.</strong> The model never sets the score itself. It can only nudge a score the rules already produced, by at most <code>round(±confidence × 25)</code>.</li>
+  <li><strong>It cannot clear a dangerous message.</strong> Anything the rules scored 60 or above stays at 35 or above no matter what the model says, so it can never talk a scam down into looking safe.</li>
+  <li><strong>It cannot take the service down.</strong> If the model is missing, slow (we wait 12 seconds) or returns nonsense, the analyzer quietly carries on with the rules alone and the user notices nothing.</li>
+  <li><strong>It stays on our own machine.</strong> The model runs locally, so nobody's message is sent off to an outside company. It is switched off by default in the Docker setup.</li>
 </ul>
 <p>
-This ordering is the point: the LLM is an <em>enhancement to recall</em> that cannot damage precision or
-availability. A graduation project that put the model in the critical path would be less trustworthy, not
-more modern.
+The order matters. The model can help us catch a scam the rules missed, but it can never make the platform
+slower, less available, or wrong about something the rules already got right.
 </p>
 
 <!-- ================================================================ -->
@@ -655,9 +666,9 @@ erDiagram
 <!-- ================================================================ -->
 <h2 id="moderation"><span class="no">11.</span>Moderation: how a report becomes public</h2>
 <p>
-A community database is only as trustworthy as its gate. If anyone could publish a report instantly, the
-platform would become an instrument for defaming a competitor's phone number or a personal enemy, the
-opposite of its purpose. So <code>Report.status</code> is not decoration: it is the mechanism.
+A community database is only as trustworthy as its gate. Imagine a shop owner reporting a rival's phone
+number, or someone settling a personal score. If reports went live the moment they were submitted, we would
+have built a tool for exactly that. <code>Report.status</code> is what stops it.
 </p>
 <figure class="diagram">
 <pre class="mermaid">
@@ -682,9 +693,8 @@ stateDiagram-v2
 <figcaption>Figure 7b. Report lifecycle. Every public read path filters on <code>APPROVED</code>; a single moderator decision is what propagates a report to the website, the scoring engines, and every mobile device.</figcaption>
 </figure>
 <p>
-The moderation API is guarded by a shared secret sent in the <code>x-admin-token</code> header and compared
-in constant time. Three design choices are worth stating explicitly, because each prevents a specific
-failure:
+The moderation API is protected by a shared secret, sent in the <code>x-admin-token</code> header and
+compared in constant time. Three choices there each came from asking what would go wrong without them:
 </p>
 <table>
   <thead><tr><th>Choice</th><th>Failure it prevents</th></tr></thead>
@@ -694,22 +704,22 @@ failure:
     <tr><td><strong>Queue ordered oldest-first</strong></td><td>Reports starving at the bottom of a growing list.</td></tr>
   </tbody>
 </table>
-<p class="footnote">Table 5d. Moderation safeguards. The console lives at <code>/admin</code> and is deliberately absent from the site navigation; the token is held in <code>sessionStorage</code> so it expires with the tab unless the moderator opts into persistence.</p>
+<p class="footnote">Table 5d. Moderation safeguards. The console sits at <code>/admin</code> and is not linked from anywhere on the site, so a moderator has to know the address. The token is kept in <code>sessionStorage</code>, which means it disappears when the tab closes unless the moderator asks us to remember it.</p>
 <div class="card honest">
 <p>
-<strong>An honest limitation.</strong> This is single-secret authentication, not user accounts: it identifies
-<em>a</em> moderator, not <em>which</em> moderator, and therefore supports no audit trail of who approved
-what. That is an accepted trade-off for a project with one operator. A production deployment serving a real
-community would need per-moderator accounts, an action log, and a four-eyes rule for rejections, recorded
-here as known future work rather than left as an implicit gap.
+<strong>Where this falls short.</strong> One shared password is not the same as user accounts. It proves
+someone is a moderator, but not <em>which</em> moderator, so there is no record of who approved what. For a
+project run by one person that is a reasonable place to stop. A platform actually serving a community would
+need an account for each moderator, a log of their decisions, and probably a second pair of eyes before a
+report is rejected. We are noting that here rather than leaving it for someone to discover.
 </p>
 </div>
 
 <!-- ================================================================ -->
 <h2 id="deploy"><span class="no">12.</span>Deployment</h2>
 <p>
-Development runs on SQLite with no external services: clone, install, migrate, run. Production runs the
-same code against PostgreSQL in containers:
+While developing we use SQLite, so there is nothing to install and set up first: clone the repository, install,
+migrate, run. In production the same code runs against PostgreSQL in containers:
 </p>
 <figure class="diagram">
 <pre class="mermaid">
@@ -726,21 +736,21 @@ flowchart LR
 <figcaption>Figure 7c. Production stack. nginx falls back to <code>index.html</code> so client-side routes such as <code>/admin</code> survive a page reload, and resolves the backend per request so it boots even while the API is still starting.</figcaption>
 </figure>
 <p>
-Two implementation details are worth recording because both were discovered by running the stack rather
-than by reading documentation:
+Two details are worth writing down, because we found both the hard way, by running the stack rather than
+reading about it:
 </p>
 <ul>
-  <li><strong>Migrations run before traffic.</strong> The container applies <code>prisma migrate deploy</code> in its entrypoint and only then starts the server, so the API is never reachable against a schema that does not yet exist. The command is idempotent, making restarts safe.</li>
-  <li><strong>Two Prisma schemas, one source of truth.</strong> Prisma will not accept the datasource <em>provider</em> from an environment variable, so running SQLite in development and PostgreSQL in production requires one schema file per provider. The development schema is authoritative and the production one is kept in sync deliberately, a maintenance cost recorded here rather than hidden.</li>
+  <li><strong>The database is updated before anyone can reach it.</strong> The container runs <code>prisma migrate deploy</code> and only then starts the server, so nobody can hit the API while the tables it needs are still missing. Running it twice does no harm, so restarting is safe.</li>
+  <li><strong>Two schema files, one of them in charge.</strong> Prisma will not let you choose the database type with a setting, so using SQLite while developing and PostgreSQL in production means keeping a separate schema file for each. The development one is the one we edit; the production one has to be updated to match by hand. That is a small ongoing chore, and we would rather write it down than let the next person trip over it.</li>
 </ul>
 
 <!-- ================================================================ -->
 <h2 id="eval"><span class="no">13.</span>Evaluation &amp; Verification</h2>
 <p>
-Two different questions have to be answered separately, and conflating them would be a mistake:
-<strong>“is the code correct?”</strong> is settled by the test suite and is answered <em>now</em>;
-<strong>“is the detection accurate?”</strong> is a measurement against labeled real-world scams and is
-answered by the evaluation below, which is still pending its corpus.
+There are two questions here, and it would be easy to blur them. <strong>“Does the code work?”</strong> is
+answered by the test suite, and we can answer it today. <strong>“Does the detection actually catch
+scams?”</strong> can only be answered by measuring it against a collection of real, labelled scams, which we
+are still gathering.
 </p>
 
 <h3>13.1 Detection accuracy (planned)</h3>
@@ -758,15 +768,16 @@ answered by the evaluation below, which is still pending its corpus.
 <p class="footnote">Table 6. Evaluation metrics. Misclassified samples from each round feed back into rule weights (Figure 2 feedback edge).</p>
 <div class="card honest">
 <p>
-<strong>Status: not yet measured.</strong> These are targets, not results. Reporting them as achievements
-before the labeled corpus exists would misrepresent the project. What <em>is</em> measured today is the
-correctness of the implementation, below.
+<strong>We have not measured these yet.</strong> They are the targets we set, not results we achieved.
+Until the labelled collection exists we have no honest way to report a number here. What we can show today
+is that the implementation itself is tested, below.
 </p>
 </div>
 
 <h3>13.2 Implementation correctness (achieved)</h3>
 <p>
-Every engine, endpoint, and screen is covered by automated tests that run on every change: <strong>151 across the three tiers</strong>, all passing:
+Every engine, endpoint and screen has tests that run whenever the code changes. There are
+<strong>151 of them</strong> across the three parts of the project, and all pass:
 </p>
 <table>
   <thead><tr><th>Tier</th><th>Tests</th><th>What they pin down</th></tr></thead>
@@ -778,13 +789,13 @@ Every engine, endpoint, and screen is covered by automated tests that run on eve
 </table>
 <p class="footnote">Table 6b. Automated test coverage. Several tests exist specifically to pin security properties rather than behaviour: that a report cannot be published without a valid token, that the admin token never appears in a URL, that a rejected token is discarded, and that <code>PENDING</code> reports never leak into any public read path.</p>
 <p>
-The moderation path is verified end-to-end rather than only in units: a test submits a report, confirms it is
-absent from public search, confirms an unauthenticated approval attempt fails with <code>401</code> and leaves
-the status untouched, approves it with a valid token, and then confirms it appears in both public search and
-the phone blocklist. The full production stack was additionally exercised in real containers against
-PostgreSQL, which is how three defects were found that unit tests could not have caught: a missing native
-dependency, a filesystem permission error under the unprivileged container user, and a proxy that resolved
-its upstream only once at start-up.
+The moderation path is tested the whole way through, not just piece by piece. One test submits a report,
+checks it cannot be found in public search, tries to approve it without a token and confirms that fails with
+a <code>401</code> and changes nothing, approves it properly, and only then checks that it shows up in both
+the search results and the phone blocklist. We also ran the real production stack in containers against
+PostgreSQL, which turned up three problems no unit test would have found: a missing system library, a file
+permission error under the container's restricted user, and a proxy that looked up the backend address once
+at start-up and then never again.
 </p>
 
 <!-- ================================================================ -->
