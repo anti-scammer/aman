@@ -1,8 +1,16 @@
 /* ============================================================
-   Aman — Palestinian anti-fraud platform · Design system
+   Aman · Palestinian anti-fraud platform · Design system
    Deep Palestinian green + warm off-white + sparing flag red.
    RTL-first: logical properties everywhere so ar/en both work.
-   Spacing on a 4px grid; radius scale 8/12/16; layered shadows.
+   Spacing on a 4px grid; radius scale 10/14/20; layered shadows.
+
+   Surfaces are frosted glass: a translucent white face over a
+   blurred, saturated backdrop, with a hairline top highlight so
+   the panel reads as a lit edge rather than a flat rectangle.
+   The recipe lives in one place, under "Glass surfaces" near the
+   end of this file, and the tokens below feed it. Text always
+   sits on the near-opaque variant so contrast never depends on
+   whatever happens to be behind it.
    ============================================================ */
 
 :root {
@@ -18,7 +26,7 @@
   --brand-100: #dcefe2;
   --brand-50: #edf6f0;
 
-  /* Accent (flag red) — CTAs / danger only */
+  /* Accent (flag red): CTAs and danger only */
   --accent: #ce1126;
   --accent-700: #a90e1f;
   --accent-50: #fdedef;
@@ -29,7 +37,7 @@
   --ink-faint: #7d8880;
   --line: #e1e8e2;
   --line-strong: #cbd6cd;
-  --bg: #f8faf8;
+  --bg: #eff4f0;
   --card: #ffffff;
 
   /* Verdict colors */
@@ -44,14 +52,42 @@
   --dangerous-bg: #fcecec;
 
   /* Radius scale */
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
 
   /* Layered shadows */
   --shadow-1: 0 1px 2px rgba(12, 59, 32, 0.06), 0 1px 6px rgba(12, 59, 32, 0.05);
   --shadow-2: 0 2px 4px rgba(12, 59, 32, 0.06), 0 8px 24px rgba(12, 59, 32, 0.08);
   --shadow-3: 0 4px 10px rgba(12, 59, 32, 0.1), 0 18px 48px rgba(12, 59, 32, 0.14);
+
+  /* --- Glass -------------------------------------------------
+     The face is a gradient rather than a flat alpha so the panel
+     catches light at the top and settles into the page at the
+     bottom. Saturation is pushed past 100% because blurring a
+     backdrop washes its colour out.
+     ----------------------------------------------------------- */
+  --glass-blur: blur(22px) saturate(175%);
+  --glass-blur-heavy: blur(30px) saturate(190%);
+
+  /* Text-bearing panels: opaque enough to read on any backdrop. */
+  --glass-face: linear-gradient(158deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.7));
+  /* Chrome and decoration, where a little more of the page shows through. */
+  --glass-face-soft: linear-gradient(158deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42));
+  /* On the dark green hero and footer. */
+  --glass-face-dark: linear-gradient(158deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
+
+  --glass-edge: rgba(255, 255, 255, 0.75);
+  --glass-edge-dark: rgba(255, 255, 255, 0.24);
+
+  /* Kept separate so rules can compose them in any order. */
+  --glass-ring: 0 0 0 1px rgba(12, 59, 32, 0.06);
+  --glass-sheen: inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(12, 59, 32, 0.04);
+  --glass-lift-1: 0 2px 6px -2px rgba(12, 59, 32, 0.1), 0 14px 30px -16px rgba(12, 59, 32, 0.32);
+  --glass-lift-2: 0 4px 12px -4px rgba(12, 59, 32, 0.14), 0 26px 54px -22px rgba(12, 59, 32, 0.42);
+  --glass-lift-3: 0 8px 20px -6px rgba(12, 59, 32, 0.18), 0 40px 80px -30px rgba(12, 59, 32, 0.5);
 
   --font:
     'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', 'Noto Sans Arabic',
@@ -70,11 +106,23 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Frosted panels need something worth blurring. The page carries a very low
+   contrast wash of the brand colours: green at the corners, a warm olive note
+   on one side, the faintest red at the bottom. It is attached to the viewport
+   rather than the document, so a panel picks up a different tint as the page
+   scrolls under it, which is what sells the glass. */
 body {
   margin: 0;
   font-family: var(--font);
   color: var(--ink);
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(900px 700px at 8% -5%, rgba(47, 138, 85, 0.18), transparent 60%),
+    radial-gradient(800px 640px at 100% 10%, rgba(244, 201, 93, 0.16), transparent 62%),
+    radial-gradient(760px 620px at 88% 96%, rgba(206, 17, 38, 0.06), transparent 62%),
+    radial-gradient(1000px 800px at 28% 108%, rgba(26, 107, 60, 0.14), transparent 60%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   line-height: 1.7;
   font-size: 16px;
 }
@@ -183,14 +231,17 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  color: var(--brand-600);
-  background: var(--brand-50);
-  border: 1px solid var(--brand-100);
+  color: var(--brand-700);
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.85), rgba(237, 246, 240, 0.6));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 999px;
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.8rem;
   font-size: 0.8rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
+  box-shadow: 0 0 0 1px rgba(26, 107, 60, 0.1), var(--glass-sheen);
 }
 
 .page-header h1 {
@@ -213,10 +264,14 @@ button {
   position: sticky;
   top: 0;
   z-index: 60;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66));
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 0 rgba(12, 59, 32, 0.05),
+    0 16px 34px -28px rgba(12, 59, 32, 0.55);
 }
 
 .header-inner {
@@ -285,14 +340,18 @@ button {
 }
 
 .nav-link:hover {
-  background: var(--brand-50);
+  background: rgba(255, 255, 255, 0.7);
   color: var(--brand-800);
+  box-shadow: var(--glass-ring), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
+/* The active link is the one raised pill in the bar. */
 .nav-link.active {
-  background: var(--brand-100);
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.95), rgba(220, 239, 226, 0.8));
   color: var(--brand-900);
   font-weight: 700;
+  box-shadow: 0 0 0 1px rgba(26, 107, 60, 0.16), inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 6px 14px -8px rgba(12, 59, 32, 0.4);
 }
 
 /* Check dropdown */
@@ -305,10 +364,12 @@ button {
   top: calc(100% + 6px);
   inset-inline-start: 0;
   min-width: 240px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  box-shadow: var(--shadow-3);
+  background: var(--glass-face);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-lg);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift-3);
   padding: 0.375rem;
   display: none;
   flex-direction: column;
@@ -371,20 +432,32 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  background: var(--accent);
+  background: linear-gradient(175deg, #e0273c, var(--accent-700));
   color: #fff;
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 700;
-  padding: 0.45rem 0.9rem;
+  padding: 0.45rem 0.95rem;
   border-radius: 999px;
   margin-inline-start: 0.375rem;
   white-space: nowrap;
-  transition: background 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+    0 2px 6px -2px rgba(169, 14, 31, 0.45),
+    0 12px 24px -14px rgba(169, 14, 31, 0.8);
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.16s ease;
 }
 
 .nav-cta:hover {
-  background: var(--accent-700);
+  background: linear-gradient(175deg, #ea3346, var(--accent));
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+    0 4px 10px -3px rgba(169, 14, 31, 0.45),
+    0 18px 32px -16px rgba(169, 14, 31, 0.85);
 }
 
 .lang-toggle {
@@ -392,8 +465,10 @@ button {
   align-items: center;
   gap: 0.3rem;
   margin-inline-start: 0.375rem;
-  background: transparent;
-  border: 1px solid var(--line-strong);
+  background: var(--glass-face-soft);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   color: var(--ink-soft);
   border-radius: 999px;
   padding: 0.32rem 0.8rem;
@@ -401,33 +476,40 @@ button {
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  box-shadow: var(--glass-ring), var(--glass-sheen);
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .lang-toggle:hover {
-  border-color: var(--brand-500);
   color: var(--brand-800);
-  background: var(--brand-50);
+  background: var(--glass-face);
+  box-shadow: 0 0 0 1px rgba(26, 107, 60, 0.28), var(--glass-sheen), var(--glass-lift-1);
 }
 
 .menu-button {
   display: none;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: 1px solid var(--line-strong);
+  background: var(--glass-face-soft);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   color: var(--ink);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   width: 40px;
   height: 40px;
   cursor: pointer;
+  box-shadow: var(--glass-ring), var(--glass-sheen);
 }
 
 /* Mobile slide-in panel */
 .mobile-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(8, 41, 22, 0.45);
+  background: rgba(8, 41, 22, 0.32);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
   z-index: 70;
   opacity: 0;
   pointer-events: none;
@@ -445,9 +527,12 @@ button {
   bottom: 0;
   inset-inline-end: 0;
   width: min(320px, 88vw);
-  background: var(--card);
+  background: linear-gradient(200deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.82));
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border-inline-start: 1px solid var(--glass-edge);
   z-index: 80;
-  box-shadow: var(--shadow-3);
+  box-shadow: var(--glass-lift-3);
   transform: translateX(100%);
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   display: flex;
@@ -639,17 +724,22 @@ button {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: var(--r-sm);
+  border-radius: 999px;
   border: 1px solid transparent;
   padding: 0.6rem 1.4rem;
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.15s ease, transform 0.06s ease, box-shadow 0.15s ease;
+  transition: background 0.18s ease, transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
-.btn:active {
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
   transform: translateY(1px);
 }
 
@@ -658,41 +748,59 @@ button {
   cursor: not-allowed;
 }
 
+/* The lit top edge and the darker bottom edge are what make a solid button
+   look moulded rather than painted. */
 .btn-primary {
-  background: var(--brand-600);
+  background: linear-gradient(175deg, var(--brand-500), var(--brand-700));
   color: #fff;
-  box-shadow: 0 1px 2px rgba(12, 59, 32, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 2px 6px -2px rgba(12, 59, 32, 0.4),
+    0 12px 26px -14px rgba(12, 59, 32, 0.7);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--brand-500);
+  background: linear-gradient(175deg, var(--brand-400), var(--brand-600));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 4px 10px -3px rgba(12, 59, 32, 0.42),
+    0 18px 34px -16px rgba(12, 59, 32, 0.75);
 }
 
 .btn-outline {
-  background: var(--card);
+  background: var(--glass-face);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: var(--brand-800);
-  border-color: var(--brand-200);
+  border-color: var(--glass-edge);
+  box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift-1);
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: var(--brand-50);
-  border-color: var(--brand-500);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(26, 107, 60, 0.22), var(--glass-sheen), var(--glass-lift-2);
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--glass-face-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: var(--glass-edge-dark);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.14));
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .btn-lg {
   padding: 0.8rem 1.9rem;
   font-size: 1.02rem;
-  border-radius: var(--r-md);
 }
 
 .btn-sm {
@@ -717,14 +825,47 @@ button {
 .hero {
   position: relative;
   overflow: hidden;
+  /* Several soft light sources rather than one, so the dark field has
+     somewhere to go instead of reading as a flat block of green. */
   background:
     radial-gradient(900px 420px at 85% -10%, rgba(47, 138, 85, 0.55), transparent 70%),
+    radial-gradient(620px 420px at 12% 110%, rgba(143, 211, 168, 0.28), transparent 68%),
+    radial-gradient(520px 340px at 62% 118%, rgba(244, 201, 93, 0.14), transparent 70%),
     linear-gradient(150deg, var(--brand-950) 0%, var(--brand-900) 45%, var(--brand-700) 100%);
   color: #fff;
   padding-block: 4rem 4.5rem;
+  /* Softening the bottom edge stops the dark band reading as a screenshot
+     pasted onto the page. The stats strip that overlaps it lives inside the
+     container, so it never reaches the rounded corners. */
+  border-end-start-radius: var(--r-xl);
+  border-end-end-radius: var(--r-xl);
 }
 
-/* Faint tatreez-inspired diamond lattice — pure CSS gradients. */
+/* Two out-of-focus orbs drifting behind the copy, over the base gradient and
+   the tatreez lattice. They hold still for anyone who has asked the system to
+   reduce motion, via the global reduced-motion rule near the top of the file. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(320px 320px at 22% 30%, rgba(143, 211, 168, 0.22), transparent 65%),
+    radial-gradient(260px 260px at 78% 68%, rgba(244, 201, 93, 0.16), transparent 65%);
+  filter: blur(30px);
+  animation: hero-drift 26s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes hero-drift {
+  from {
+    transform: translate3d(-2%, -1.5%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2.5%, 2%, 0) scale(1.08);
+  }
+}
+
+/* Faint tatreez-inspired diamond lattice, in pure CSS gradients. */
 .hero::before {
   content: '';
   position: absolute;
@@ -747,6 +888,8 @@ button {
 
 .hero-inner {
   position: relative;
+  /* Keeps the copy above the drifting orbs and the lattice. */
+  z-index: 1;
   max-width: 840px;
 }
 
@@ -794,13 +937,16 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: var(--glass-face-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-edge-dark);
   border-radius: 999px;
-  padding: 0.3rem 0.9rem;
+  padding: 0.32rem 0.95rem;
   font-size: 0.82rem;
   font-weight: 500;
   margin-bottom: 1.25rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .hero h1 {
@@ -825,14 +971,23 @@ button {
   flex-wrap: wrap;
 }
 
+/* Inverted on the dark hero: the light button becomes the solid one. */
 .hero .btn-primary {
-  background: #fff;
+  background: linear-gradient(175deg, #ffffff, #eaf3ec);
   color: var(--brand-900);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(12, 59, 32, 0.12),
+    0 8px 30px -8px rgba(0, 0, 0, 0.45);
 }
 
 .hero .btn-primary:hover:not(:disabled) {
-  background: var(--brand-50);
+  background: linear-gradient(175deg, #ffffff, var(--brand-50));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(12, 59, 32, 0.12),
+    0 12px 38px -10px rgba(0, 0, 0, 0.5);
 }
 
 .section {
@@ -1217,30 +1372,43 @@ fieldset.field legend {
   margin: 0;
 }
 
+/* Inputs read as recessed glass: the inner shadow at the top is the lip of
+   the well, the opposite of the raised lip on a button. */
 .field-input {
-  border: 1.5px solid var(--line-strong);
-  border-radius: var(--r-sm);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--r-md);
   padding: 0.65rem 0.875rem;
   font-size: 0.95rem;
   font-family: inherit;
-  background: #fff;
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.95));
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: var(--ink);
   width: 100%;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 0 0 1px rgba(12, 59, 32, 0.08), inset 0 2px 5px -2px rgba(12, 59, 32, 0.16);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.field-input:hover:not(:focus) {
+  box-shadow: 0 0 0 1px rgba(12, 59, 32, 0.14), inset 0 2px 5px -2px rgba(12, 59, 32, 0.16);
 }
 
 .field-input:focus {
   outline: none;
-  border-color: var(--brand-500);
-  box-shadow: var(--focus-ring);
+  border-color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 0 0 1px var(--brand-500), var(--focus-ring),
+    inset 0 2px 5px -3px rgba(12, 59, 32, 0.12);
 }
 
 .field-input.invalid {
-  border-color: var(--dangerous);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px var(--dangerous), inset 0 2px 5px -2px rgba(179, 36, 36, 0.2);
 }
 
 .field-input.invalid:focus {
-  box-shadow: 0 0 0 3px rgba(208, 59, 59, 0.2);
+  box-shadow: 0 0 0 1px var(--dangerous), 0 0 0 3px rgba(208, 59, 59, 0.2),
+    inset 0 2px 5px -3px rgba(179, 36, 36, 0.18);
 }
 
 .field-input.mono {
@@ -1270,18 +1438,22 @@ fieldset.field legend {
 }
 
 .radio-pill {
-  border: 1.5px solid var(--line-strong);
+  border: 1px solid var(--glass-edge);
   border-radius: 999px;
   padding: 0.45rem 1.05rem;
   font-size: 0.9rem;
   cursor: pointer;
   user-select: none;
-  background: #fff;
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  background: var(--glass-face);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-ring), var(--glass-sheen);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .radio-pill:hover {
-  border-color: var(--brand-400);
+  box-shadow: 0 0 0 1px rgba(47, 138, 85, 0.35), var(--glass-sheen), var(--glass-lift-1);
 }
 
 .radio-pill input {
@@ -1291,10 +1463,11 @@ fieldset.field legend {
 }
 
 .radio-pill.selected {
-  background: var(--brand-100);
-  border-color: var(--brand-600);
+  background: linear-gradient(158deg, rgba(220, 239, 226, 0.95), rgba(191, 224, 203, 0.85));
+  border-color: rgba(255, 255, 255, 0.9);
   color: var(--brand-900);
   font-weight: 700;
+  box-shadow: 0 0 0 1px var(--brand-500), var(--glass-sheen), var(--glass-lift-1);
 }
 
 /* ------------------------------------------------------------
@@ -2140,12 +2313,17 @@ fieldset.field legend {
 }
 
 .quiz-cta-card .btn-primary {
-  background: #fff;
+  background: linear-gradient(175deg, #ffffff, #eaf3ec);
   color: var(--brand-900);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(12, 59, 32, 0.12),
+    0 8px 26px -10px rgba(0, 0, 0, 0.4);
 }
 
 .quiz-cta-card .btn-primary:hover:not(:disabled) {
-  background: var(--brand-50);
+  background: linear-gradient(175deg, #ffffff, var(--brand-50));
 }
 
 .article-grid {
@@ -2419,6 +2597,178 @@ fieldset.field legend {
 .quiz-result-track {
   max-width: 320px;
   margin: 0.75rem auto 1rem;
+}
+
+/* ------------------------------------------------------------
+   Glass surfaces
+
+   Every raised panel in the app shares one recipe, collected here
+   rather than repeated in each component so the look can be tuned
+   in a single place. It lands after the component rules on purpose:
+   the rules above still own layout, spacing and semantic colour,
+   and this section only replaces the surface treatment.
+
+   The recipe is four layers. A translucent gradient face, a blurred
+   and saturated backdrop, a hairline ring that keeps the edge legible
+   where the face matches the page behind it, and an inset highlight
+   along the top that reads as light catching the rim.
+   ------------------------------------------------------------ */
+
+.glass,
+.card,
+.stat-cell,
+.feature-card,
+.how-step,
+.recent-card,
+.verdict-card,
+.trust-card,
+.quiz-option {
+  background: var(--glass-face);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--r-lg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift-1);
+}
+
+/* Panels that carry a result rather than a prompt sit slightly higher. */
+.verdict-card,
+.trust-card {
+  box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift-2);
+}
+
+/* Interactive panels lift toward the reader on hover. */
+.feature-card:hover,
+.article-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(47, 138, 85, 0.24), var(--glass-sheen), var(--glass-lift-2);
+}
+
+.quiz-option:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.96), rgba(237, 246, 240, 0.82));
+  box-shadow: 0 0 0 1px rgba(26, 107, 60, 0.3), var(--glass-sheen), var(--glass-lift-1);
+}
+
+/* Answered options keep the glass but tint the face toward the verdict, so
+   the colour still carries the meaning at a glance. */
+.quiz-option.correct {
+  background: linear-gradient(158deg, rgba(236, 248, 236, 0.96), rgba(214, 240, 214, 0.86));
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px var(--safe), var(--glass-sheen), var(--glass-lift-1);
+}
+
+.quiz-option.wrong {
+  background: linear-gradient(158deg, rgba(252, 236, 236, 0.96), rgba(247, 216, 216, 0.86));
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px var(--dangerous), var(--glass-sheen), var(--glass-lift-1);
+}
+
+.feedback-error {
+  background: linear-gradient(158deg, rgba(252, 236, 236, 0.94), rgba(247, 219, 219, 0.82));
+  border-color: rgba(255, 255, 255, 0.85);
+  border-radius: var(--r-lg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 0 0 1px rgba(179, 36, 36, 0.22), var(--glass-sheen), var(--glass-lift-1);
+}
+
+/* Sender verdicts wash the top of the glass toward the answer, then fade back
+   to a neutral face so the body text keeps its contrast. Restated here because
+   the shared .trust-card rule above would otherwise flatten them. */
+.trust-official {
+  background: linear-gradient(180deg, rgba(236, 248, 236, 0.95), rgba(255, 255, 255, 0.78) 60%);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(12, 125, 11, 0.22), var(--glass-sheen), var(--glass-lift-2);
+}
+
+.trust-reported {
+  background: linear-gradient(180deg, rgba(252, 236, 236, 0.95), rgba(255, 255, 255, 0.78) 60%);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(179, 36, 36, 0.22), var(--glass-sheen), var(--glass-lift-2);
+}
+
+/* The verdict stripe was flush with the panel edge, where the new corner
+   radius would have eaten both of its ends. It is now an inset pill that
+   floats clear of the corners. */
+.verdict-card::before,
+.flagged-card::before {
+  inset-block: 0.95rem;
+  inset-inline-start: 0.7rem;
+  width: 5px;
+  border-radius: 999px;
+}
+
+/* The quiz banner is glass over green rather than over the page, so it keeps
+   its own gradient and takes the dark edge and highlight. It has to restate
+   the gradient because the shared .card rule above now sets a light face. */
+.quiz-cta-card {
+  background:
+    radial-gradient(500px 200px at 90% -30%, rgba(255, 255, 255, 0.16), transparent),
+    linear-gradient(135deg, var(--brand-900), var(--brand-600));
+  border: 1px solid var(--glass-edge-dark);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), var(--glass-lift-2);
+}
+
+.site-footer {
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+/* Not every browser has backdrop-filter, and some readers turn transparency
+   off at the OS level. Both get the same solid panel: the layout, the ring
+   and the highlight all survive, only the see-through goes. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .card,
+  .stat-cell,
+  .feature-card,
+  .how-step,
+  .recent-card,
+  .verdict-card,
+  .trust-card,
+  .quiz-option,
+  .site-header,
+  .nav-dropdown-menu,
+  .mobile-panel,
+  .btn-outline,
+  .radio-pill,
+  .lang-toggle,
+  .menu-button,
+  .field-input,
+  .page-eyebrow {
+    background: var(--card);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .card,
+  .stat-cell,
+  .feature-card,
+  .how-step,
+  .recent-card,
+  .verdict-card,
+  .trust-card,
+  .quiz-option,
+  .site-header,
+  .nav-dropdown-menu,
+  .mobile-panel,
+  .btn-outline,
+  .radio-pill,
+  .lang-toggle,
+  .menu-button,
+  .field-input,
+  .page-eyebrow {
+    background: var(--card);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  body {
+    background-image: none;
+  }
 }
 
 /* ------------------------------------------------------------
