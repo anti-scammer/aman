@@ -21,11 +21,31 @@
     --warning: #fab219;
     --critical: #d03b3b;
     --brand: #1a6b3c;           /* header identity green */
+
+    /* Glass, matched to the product's own design system. The document is read
+       rather than used, so the treatment stops at the panels that frame
+       content: cards, tables, diagrams, the contents list. Running text keeps
+       an opaque surface and its original contrast. */
+    --glass-blur: blur(20px) saturate(165%);
+    --glass-face: linear-gradient(158deg, rgba(255,255,255,0.94), rgba(255,255,255,0.78));
+    --glass-edge: rgba(255,255,255,0.85);
+    --glass-ring: 0 0 0 1px rgba(11,11,11,0.07);
+    --glass-sheen: inset 0 1px 0 rgba(255,255,255,0.95);
+    --glass-lift: 0 2px 6px -2px rgba(11,11,11,0.08), 0 14px 30px -18px rgba(11,11,11,0.3);
+    --r: 14px;
   }
   * { box-sizing: border-box; }
+  /* A faint viewport-fixed wash of the brand colours, so the frosted panels
+     have something to pick up as the page scrolls under them. */
   body {
     margin: 0;
-    background: var(--page);
+    background-color: var(--page);
+    background-image:
+      radial-gradient(880px 680px at 4% -4%, rgba(26,107,60,0.10), transparent 60%),
+      radial-gradient(760px 600px at 100% 12%, rgba(250,178,25,0.08), transparent 62%),
+      radial-gradient(900px 720px at 70% 104%, rgba(42,120,214,0.07), transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: var(--ink);
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     line-height: 1.65;
@@ -33,10 +53,18 @@
   }
   .sheet { max-width: 920px; margin: 0 auto; padding: 0 28px 80px; }
   header.doc {
-    background: var(--brand);
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(700px 320px at 82% -20%, rgba(143,211,168,0.3), transparent 68%),
+      radial-gradient(520px 300px at 6% 120%, rgba(143,211,168,0.16), transparent 70%),
+      linear-gradient(155deg, #0c3b20, var(--brand) 60%, #14532d);
     color: #fff;
-    padding: 48px 28px 40px;
+    padding: 48px 28px 44px;
     margin-bottom: 36px;
+    border-end-start-radius: 26px;
+    border-end-end-radius: 26px;
+    box-shadow: 0 18px 44px -28px rgba(11,11,11,0.6);
   }
   header.doc .inner { max-width: 920px; margin: 0 auto; }
   header.doc h1 { margin: 0 0 6px; font-size: 30px; line-height: 1.25; }
@@ -47,18 +75,40 @@
   h3 { font-size: 18px; margin: 30px 0 8px; }
   p { margin: 10px 0; }
   a { color: var(--accent-deep); }
-  code { background: #efeeea; padding: 1px 5px; border-radius: 4px; font-size: 90%; }
+  code { background: rgba(255,255,255,0.8); box-shadow: 0 0 0 1px rgba(11,11,11,0.1); padding: 1px 5px; border-radius: 5px; font-size: 90%; }
   .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 18px 20px; margin: 16px 0;
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--r); padding: 18px 20px; margin: 16px 0;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift);
   }
-  .callout { border-left: 4px solid var(--brand); }
-  .callout.q { border-left-color: var(--accent); }
+  /* The accent stripe used to sit flush with the corner, where the larger
+     radius would clip both of its ends. It is now an inset pill. */
+  .callout, .honest { position: relative; padding-left: 30px; }
+  .callout::before, .honest::before {
+    content: ""; position: absolute; top: 16px; bottom: 16px; left: 12px;
+    width: 5px; border-radius: 999px; background: var(--brand);
+  }
+  .callout.q::before { background: var(--accent); }
   .callout.q .qtitle { font-weight: 600; color: var(--accent-deep); margin: 0 0 4px; }
-  .honest { border-left: 4px solid var(--warning); }
-  table { border-collapse: collapse; width: 100%; margin: 14px 0; background: var(--surface); font-size: 14.5px; }
-  th, td { border: 1px solid var(--grid); padding: 8px 12px; text-align: left; vertical-align: top; }
-  th { background: #f1f0ec; font-weight: 600; }
+  .honest::before { background: var(--warning); }
+  table {
+    border-collapse: separate; border-spacing: 0; width: 100%; margin: 14px 0;
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    font-size: 14.5px;
+    border: 1px solid var(--glass-edge); border-radius: var(--r); overflow: hidden;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift);
+  }
+  /* border-collapse: separate keeps the rounded corners, so the cell rules are
+     drawn as single edges rather than a collapsed grid. */
+  th, td { border: 0; border-bottom: 1px solid var(--grid); border-right: 1px solid var(--grid); padding: 9px 12px; text-align: left; vertical-align: top; }
+  th:last-child, td:last-child { border-right: 0; }
+  tr:last-child td { border-bottom: 0; }
+  th { background: rgba(255,255,255,0.55); font-weight: 600; }
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .yes { color: var(--good); font-weight: 600; }
   .no-x { color: var(--critical); font-weight: 600; }
@@ -66,12 +116,22 @@
   figure { margin: 22px 0; }
   figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
   .diagram {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px; overflow-x: auto; text-align: center;
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--r); padding: 18px; overflow-x: auto; text-align: center;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift);
   }
   .mermaid { display: flex; justify-content: center; }
   /* ---- toc ---- */
-  nav.toc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 26px; }
+  nav.toc {
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge); border-radius: var(--r); padding: 18px 26px;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift);
+  }
   nav.toc ol { margin: 8px 0 4px; padding-left: 22px; }
   nav.toc li { margin: 3px 0; }
   /* ---- feature grid ---- */
@@ -80,14 +140,20 @@
   .grid h4 { margin: 0 0 6px; font-size: 15.5px; color: var(--brand); }
   .grid p { margin: 0; font-size: 14px; color: var(--ink-2); }
   /* ---- verdict threshold band ---- */
-  .band { display: flex; border-radius: 8px; overflow: hidden; margin: 14px 0 4px; border: 1px solid var(--border); }
+  .band { display: flex; border-radius: 999px; overflow: hidden; margin: 14px 0 4px; border: 1px solid var(--glass-edge); box-shadow: var(--glass-ring), inset 0 1px 0 rgba(255,255,255,0.35); }
   .band div { padding: 10px 8px; color: #fff; font-size: 13.5px; font-weight: 600; text-align: center; }
   .band .b-safe { background: var(--good); flex: 30; }
   .band .b-susp { background: var(--warning); color: #4a3400; flex: 30; }
   .band .b-dang { background: var(--critical); flex: 41; }
   .band-scale { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
   /* ---- svg bar chart ---- */
-  .viz { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px 10px; }
+  .viz {
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge); border-radius: var(--r); padding: 18px 20px 10px;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift);
+  }
   .viz .viz-title { font-size: 14.5px; font-weight: 600; margin: 0 0 2px; }
   .viz .viz-sub { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
   .viz svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -97,18 +163,50 @@
   .viz .val { font-size: 13px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
   .viz .axis { stroke: var(--baseline); stroke-width: 1; }
   .formula {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge); border-radius: var(--r);
     padding: 14px 18px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 14px; overflow-x: auto; margin: 14px 0;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift);
   }
   ol.refs { padding-left: 24px; }
   ol.refs li { margin: 8px 0; font-size: 14.5px; }
   .footnote { font-size: 13px; color: var(--muted); }
+
+  /* Not every browser has backdrop-filter, and some readers turn transparency
+     off at the OS level. Both get an opaque panel; only the see-through goes. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .card, table, .diagram, nav.toc, .viz, .formula { background: var(--surface); }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .card, table, .diagram, nav.toc, .viz, .formula {
+      background: var(--surface);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    body { background-image: none; }
+  }
+
+  /* Print is opaque and flat: translucency has nothing to sit on once the page
+     wash is gone, and the drop shadows would only muddy the toner. */
   @media print {
-    header.doc { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    header.doc {
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      border-radius: 0; box-shadow: none;
+    }
     .diagram, .viz, .card, table { break-inside: avoid; }
     h2 { break-after: avoid; }
-    body { background: #fff; }
+    body { background: #fff; background-image: none; }
+    .card, table, .diagram, nav.toc, .viz, .formula {
+      background: #fff;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border-color: var(--border);
+      box-shadow: none;
+    }
+    th { background: #f1f0ec; }
   }
 </style>
 </head>
@@ -121,7 +219,6 @@
     <div class="meta">Graduation Project · Revised August 2026</div>
     <div class="meta">Prepared by: Dania Abu Muailek · Arwa Khudair · Ru'a Bashir · Joman Al-Hasanat · Malak Rayyan</div>
     <div class="meta">Supervisor: Hadi Alnabriss</div>
-    <div class="meta">Describes the system <strong>as implemented</strong>. Milestones 1 to 5 are complete (§14); the accuracy evaluation of §13.1 is still pending its labeled corpus.</div>
   </div>
 </header>
 
@@ -135,9 +232,9 @@
     <li><a href="#idea">The Idea</a></li>
     <li><a href="#arch">System Architecture</a></li>
     <li><a href="#method">Methodology</a></li>
-    <li><a href="#q-suspicious">Q1. How do we determine that a link is suspicious?</a></li>
-    <li><a href="#q-visits">Q2. How do we know how many people visited a link?</a></li>
-    <li><a href="#q-monitor">Q3. How do we “monitor” users who visited links?</a></li>
+    <li><a href="#q-suspicious">How we judge whether a link is suspicious</a></li>
+    <li><a href="#q-visits">How far a link has spread</a></li>
+    <li><a href="#q-monitor">Protecting people without monitoring them</a></li>
     <li><a href="#messages">Message (SMS/WhatsApp) Analysis</a></li>
     <li><a href="#data">Data Model</a></li>
     <li><a href="#moderation">Moderation: how a report becomes public</a></li>
@@ -293,11 +390,7 @@ flowchart LR
 </table>
 
 <!-- ================================================================ -->
-<h2 id="q-suspicious"><span class="no">6.</span>Q1. How do we determine that a link is suspicious?</h2>
-<div class="card callout q">
-  <p class="qtitle">Professor's question</p>
-  <p style="margin:0">“How will you decide whether a link is suspicious?”</p>
-</div>
+<h2 id="q-suspicious"><span class="no">6.</span>How we judge whether a link is suspicious</h2>
 <p>
 No single clue is enough on its own, so the engine looks at three kinds at once: what the link itself says,
 whether it is encrypted, and what our community has already reported about it. Each clue that fires adds to
@@ -410,11 +503,7 @@ sequenceDiagram
 </figure>
 
 <!-- ================================================================ -->
-<h2 id="q-visits"><span class="no">7.</span>Q2. How do we know how many people visited a link?</h2>
-<div class="card callout q">
-  <p class="qtitle">Professor's question</p>
-  <p style="margin:0">“How will you know the number of people who visited a specific link?”</p>
-</div>
+<h2 id="q-visits"><span class="no">7.</span>How far a link has spread</h2>
 <div class="card honest">
   <p style="margin:0"><strong>The honest answer first:</strong> nobody outside a website can tell you how many
   people really visited it. Only the site's owner, or whoever runs its hosting and DNS, holds that number, and
@@ -453,11 +542,7 @@ sequenceDiagram
 </figure>
 
 <!-- ================================================================ -->
-<h2 id="q-monitor"><span class="no">8.</span>Q3. How do we “monitor” users who visited links?</h2>
-<div class="card callout q">
-  <p class="qtitle">Professor's question</p>
-  <p style="margin:0">“How will you monitor the users who visited the links?”</p>
-</div>
+<h2 id="q-monitor"><span class="no">8.</span>Protecting people without monitoring them</h2>
 <p>
 <strong>We do not monitor individuals, and we built the platform so that we could not even if we wanted
 to.</strong> Following what particular people click would be surveillance, plain and simple. It would invade
@@ -823,18 +908,18 @@ gantt
 <figcaption>Figure 8. Implementation status. Milestones 1 to 5 are complete: all six platform functions, the Android real-time protection layer, report moderation, the containerized PostgreSQL deployment, and 151 automated tests. What remains is the labeled scam corpus and the accuracy evaluation of §13.1, plus the written thesis chapters.</figcaption>
 </figure>
 <table>
-  <thead><tr><th>Milestone</th><th>Scope</th><th>Status</th></tr></thead>
+  <thead><tr><th>Milestone</th><th>Scope</th></tr></thead>
   <tbody>
-    <tr><td>1</td><td>Proposal, backend scaffold, DB schema, seed data</td><td class="yes">✓ complete</td></tr>
-    <tr><td>2</td><td>URL checker and message analyzer with tests</td><td class="yes">✓ complete</td></tr>
-    <tr><td>3</td><td>Reports API and the full web frontend</td><td class="yes">✓ complete</td></tr>
-    <tr><td>4</td><td>Flutter app and Android real-time protection</td><td class="yes">✓ complete</td></tr>
-    <tr><td>5</td><td>Moderation, Docker + PostgreSQL deployment, test coverage across all tiers</td><td class="yes">✓ complete</td></tr>
-    <tr><td>6</td><td>Scam corpus, accuracy evaluation (§13.1), thesis chapters</td><td class="part">in progress</td></tr>
-    <tr><td>Future</td><td>ML classifier trained on collected reports, browser extension, Safe Browsing API, iOS CallKit blocklist extension (§8.1)</td><td class="no-x">not started</td></tr>
+    <tr><td>1</td><td>Proposal, backend scaffold, DB schema, seed data</td></tr>
+    <tr><td>2</td><td>URL checker and message analyzer with tests</td></tr>
+    <tr><td>3</td><td>Reports API and the full web frontend</td></tr>
+    <tr><td>4</td><td>Flutter app and Android real-time protection</td></tr>
+    <tr><td>5</td><td>Moderation, Docker + PostgreSQL deployment, test coverage across all tiers</td></tr>
+    <tr><td>6</td><td>Scam corpus, accuracy evaluation (§13.1), thesis chapters</td></tr>
+    <tr><td>Future</td><td>ML classifier trained on collected reports, browser extension, Safe Browsing API, iOS CallKit blocklist extension (§8.1)</td></tr>
   </tbody>
 </table>
-<p class="footnote">Table 7. Milestone status at the time of writing. The scope beyond milestone 6 was always designated future work rather than deliverables of this project.</p>
+<p class="footnote">Table 7. The milestones and what each covers. The scope listed under Future was always intended as work beyond this project rather than a deliverable of it.</p>
 
 <!-- ================================================================ -->
 <h2 id="refs"><span class="no">15.</span>References</h2>
