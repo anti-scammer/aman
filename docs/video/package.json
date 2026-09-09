@@ -1,0 +1,26 @@
+{
+  "name": "aman-video",
+  "private": true,
+  "type": "module",
+  "description": "Builds the narrated Arabic videos: the product walkthrough and the methodology deep dive. See README.md.",
+  "scripts": {
+    "narrate": "node tts.mjs",
+    "cards": "node render-cards.mjs",
+    "subs": "node render-subs.mjs",
+    "capture:web": "node capture-web.mjs",
+    "capture:mobile": "./capture-mobile.sh",
+    "verify": "node verify.mjs",
+    "build": "node build.mjs",
+    "all": "npm run narrate && npm run cards && npm run subs && npm run capture:web && npm run capture:mobile && npm run verify && npm run build",
+    "deep:narrate": "node tts.mjs --spec scenes.deepdive.json",
+    "deep:cards": "node render-cards.mjs --spec scenes.deepdive.json",
+    "deep:subs": "node render-subs.mjs --spec scenes.deepdive.json",
+    "deep:capture": "node capture-web.mjs --spec scenes.deepdive.json",
+    "deep:verify": "node verify.mjs --spec scenes.deepdive.json",
+    "deep:build": "node build.mjs --spec scenes.deepdive.json",
+    "deep:all": "npm run deep:narrate && npm run deep:cards && npm run deep:subs && npm run deep:capture && npm run deep:verify && npm run deep:build"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.7.0"
+  }
+}

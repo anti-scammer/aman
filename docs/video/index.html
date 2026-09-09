@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>فيديوهات أمان</title>
+<style>
+  :root {
+    --bg: #eff4f0;
+    --ink: #0c3b20;
+    --muted: #4a6b58;
+    --accent: #1d7a4c;
+    --glass-face: linear-gradient(158deg, rgba(255,255,255,.92), rgba(255,255,255,.7));
+    --glass-edge: rgba(255,255,255,.75);
+    --glass-ring: 0 0 0 1px rgba(12,59,32,.06);
+    --glass-sheen: inset 0 1px 0 rgba(255,255,255,.95);
+    --lift: 0 18px 40px -24px rgba(12,59,32,.45);
+    --r: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    min-height: 100vh;
+    padding: clamp(20px, 5vw, 56px) clamp(16px, 4vw, 40px) 80px;
+    background-image:
+      radial-gradient(60vw 40vw at 85% -5%, rgba(41,163,102,.16), transparent 60%),
+      radial-gradient(50vw 40vw at 10% 5%, rgba(29,122,76,.12), transparent 60%);
+    background-attachment: fixed;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  header { margin-bottom: 36px; }
+  h1 { font-size: clamp(26px, 4vw, 38px); letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin-top: 8px; font-size: 16px; }
+  .card {
+    background: var(--glass-face);
+    backdrop-filter: blur(22px) saturate(175%);
+    -webkit-backdrop-filter: blur(22px) saturate(175%);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--r);
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--lift);
+    padding: clamp(18px, 3vw, 28px);
+    margin-bottom: 24px;
+  }
+  h2 { font-size: 21px; margin-bottom: 4px; }
+  .meta { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  video { width: 100%; border-radius: 14px; background: #082916; display: block; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  a.btn {
+    display: inline-block;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: rgba(29,122,76,.1);
+    border: 1px solid rgba(29,122,76,.22);
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  a.btn:hover { background: rgba(29,122,76,.16); }
+  details { margin-top: 16px; }
+  summary { cursor: pointer; font-weight: 600; font-size: 15px; color: var(--muted); }
+  ol.ch { margin: 12px 8px 0; padding-inline-start: 20px; columns: 2; column-gap: 28px; }
+  ol.ch li { font-size: 14px; margin-bottom: 5px; break-inside: avoid; }
+  ol.ch code { color: var(--muted); font-size: 13px; }
+  footer { color: var(--muted); font-size: 13px; text-align: center; margin-top: 34px; }
+  @media (max-width: 620px) { ol.ch { columns: 1; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>فيديوهات أمان</h1>
+    <p class="sub">شرح المنصة بالعربية. الفيديوهات مسجّلة من النظام العامل، لا من نماذج تصميمية.</p>
+  </header>
+
+  <section class="card">
+    <h2>جولة في المنصة</h2>
+    <p class="meta">‏5:31 دقيقة · لأي شخص · ما الذي تفعله المنصة من البداية إلى النهاية</p>
+    <video controls preload="metadata" src="build/aman-walkthrough.ar.share.mp4"></video>
+    <div class="links">
+      <a class="btn" href="build/aman-walkthrough.ar.share.mp4" download>تنزيل (26 م.ب)</a>
+      <a class="btn" href="build/aman-walkthrough.ar.1.5x.mp4">مشاهدة بسرعة 1.5 (3:41)</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>الشرح التفصيلي للمنهجية</h2>
+    <p class="meta">‏32:11 دقيقة · لأعضاء الفريق والمطوّرين · قراءة كاملة لوثيقة كيف يعمل النظام</p>
+    <video controls preload="metadata" src="build/aman-deepdive.ar.mp4"></video>
+    <div class="links">
+      <a class="btn" href="build/aman-deepdive.ar.mp4" download>تنزيل (161 م.ب)</a>
+      <a class="btn" href="build/aman-deepdive.ar.1.5x.mp4">مشاهدة بسرعة 1.5 (21:28)</a>
+      <a class="btn" href="../how-it-works.html">الوثيقة المكتوبة</a>
+    </div>
+    <details>
+      <summary>الفصول (15)</summary>
+      <ol class="ch">
+        <li><code>00:00</code> كيف يعمل النظام</li>
+        <li><code>00:37</code> 1. المقدمة</li>
+        <li><code>02:02</code> 2. الأعمال السابقة</li>
+        <li><code>03:56</code> 3. الفكرة</li>
+        <li><code>04:44</code> 4. بنية النظام</li>
+        <li><code>06:44</code> 5. المنهجية</li>
+        <li><code>07:50</code> 6. محرّك الروابط</li>
+        <li><code>11:51</code> 7. قياس الانتشار</li>
+        <li><code>13:53</code> 8. الحماية دون مراقبة</li>
+        <li><code>17:34</code> 9. تحليل الرسائل</li>
+        <li><code>22:33</code> 10. نموذج البيانات</li>
+        <li><code>23:47</code> 11. الإشراف</li>
+        <li><code>26:35</code> 12. النشر</li>
+        <li><code>28:40</code> 13. التقييم والتحقق</li>
+        <li><code>31:47</code> خاتمة</li>
+      </ol>
+    </details>
+  </section>
+
+  <footer>الفصول مضمّنة داخل الملف، فيمكن التنقّل بينها من المشغّل مباشرة.</footer>
+</div>
+</body>
+</html>
