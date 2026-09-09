@@ -19,33 +19,36 @@ import {
 import { useI18n } from '../i18n/LanguageContext'
 import type { StringKey } from '../i18n/strings'
 
-/** Shield with an olive-branch mark — brand logo. */
+/**
+ * Brand mark: a shield holding an olive sprig.
+ * Source of truth is assets/logo/aman-mark.svg; keep the two in step.
+ */
 export function ShieldLogo({ className = 'logo-mark' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 48 48" aria-hidden="true">
+    <svg className={className} viewBox="0 0 64 64" aria-hidden="true">
       <defs>
-        <linearGradient id="aman-shield" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#1a6b3c" />
-          <stop offset="1" stopColor="#0c3b20" />
+        <linearGradient id="aman-shield" x1="0.1" y1="0" x2="0.9" y2="1">
+          <stop offset="0" stopColor="#2a8a51" />
+          <stop offset="1" stopColor="#0d4526" />
         </linearGradient>
       </defs>
       <path
-        d="M24 3 L42 9.5 V23 C42 34.5 34.5 42.5 24 45.5 C13.5 42.5 6 34.5 6 23 V9.5 Z"
+        d="M32 3.5 L57.5 12 V31.5 C57.5 46.8 47.2 57.4 32 61.5 C16.8 57.4 6.5 46.8 6.5 31.5 V12 Z"
         fill="url(#aman-shield)"
       />
-      {/* Olive branch: curved stem + leaf pairs */}
+      {/* Olive sprig: stem, two leaf pairs, one fruit */}
       <path
-        d="M24 36 C23 30 23 24 25.5 18.5"
-        stroke="#e9f5ee"
-        strokeWidth="2"
+        d="M28.8 52.5 C26.2 43 27 32.6 33.4 23.4"
+        stroke="#f2fbf5"
+        strokeWidth="3.2"
         fill="none"
         strokeLinecap="round"
       />
-      <path d="M23.4 31.5 C19.5 31.5 17 29 16.5 25.5 C20.5 25.8 23 28 23.4 31.5 Z" fill="#7fc79a" />
-      <path d="M23.6 31.5 C27.5 31 30 28.5 30.5 25 C26.5 25.4 24 27.8 23.6 31.5 Z" fill="#a8d8bb" />
-      <path d="M23.5 25.5 C20 25.3 17.8 23 17.5 19.8 C21.2 20.2 23.3 22.3 23.5 25.5 Z" fill="#a8d8bb" />
-      <path d="M24 25.3 C27.5 24.8 29.6 22.5 30 19.2 C26.3 19.8 24.3 22 24 25.3 Z" fill="#7fc79a" />
-      <circle cx="25.8" cy="15.8" r="2.3" fill="#e9f5ee" />
+      <path d="M28.4 46.6 C20.8 47 15.6 42.6 14.3 34.8 C22.1 34.6 27.4 39 28.4 46.6 Z" fill="#8ed3a8" />
+      <path d="M30.2 35.2 C23.6 34.2 19.6 29.4 19.6 22.6 C26.3 23.8 30.1 28.5 30.2 35.2 Z" fill="#8ed3a8" />
+      <path d="M30 46.8 C37.4 45.4 41.8 40.2 41.8 32.8 C34.7 34.6 30.4 39.5 30 46.8 Z" fill="#d3edde" />
+      <path d="M32.1 34.6 C38.5 32.6 42 27.2 41.4 20.4 C35.1 22.8 31.9 27.9 32.1 34.6 Z" fill="#d3edde" />
+      <circle cx="34.6" cy="19.4" r="3.4" fill="#f4c95d" />
     </svg>
   )
 }
