@@ -26,6 +26,49 @@ illustrated walkthrough is in [`docs/how-it-works.html`](./docs/how-it-works.htm
 Verdicts are color-coded (safe / suspicious / dangerous) with a 0–100 risk
 score and reasons localized in Arabic and English.
 
+## Screenshots
+
+Real output from the running application, not mockups. Verdicts, scores and
+reasons all come from the actual API against seeded data.
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/demo/img/web-check-url.jpg" alt="URL checker returning a dangerous verdict with reasons">
+      <sub><b>URL checker.</b> A lookalike of a Palestinian brand, scored out of 100 with every reason listed.</sub>
+    </td>
+    <td width="50%">
+      <img src="docs/demo/img/web-check-sender.jpg" alt="Sender and caller checker">
+      <sub><b>Sender and caller.</b> Official Palestinian senders against community reports, with spoofing warnings.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/demo/img/web-check-social.jpg" alt="Social account checker">
+      <sub><b>Social accounts.</b> Brand impersonation in handles, scam keywords and digit-suffix patterns.</sub>
+    </td>
+    <td width="50%">
+      <img src="docs/demo/img/web-quiz.jpg" alt="Awareness quiz">
+      <sub><b>Awareness hub.</b> Bilingual articles and a quiz on the scams that target Palestinians.</sub>
+    </td>
+  </tr>
+</table>
+
+### Mobile
+
+<p align="center">
+  <img src="docs/demo/img/mobile-home.jpg" width="24%" alt="Mobile home">
+  <img src="docs/demo/img/mobile-check-result.jpg" width="24%" alt="Check result on mobile">
+  <img src="docs/demo/img/mobile-call-overlay.jpg" width="24%" alt="Incoming call warning overlay">
+  <img src="docs/demo/img/mobile-protection.jpg" width="24%" alt="Real-time protection settings">
+</p>
+
+<sub>Left to right: home, a check result, the native Android warning overlay on an
+incoming call, and the real-time protection settings.</sub>
+
+The full set, including the moderation console and the English interface, is in
+[`docs/screenshots/`](./docs/screenshots/).
+
 ## Layout
 
 ```
