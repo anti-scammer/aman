@@ -1,0 +1,75 @@
+# Builds the three deliverables from a tag and publishes them as a release.
+#
+# Triggered by pushing a tag such as v1.0.0. Everything is built from the
+# tagged commit, so a release is always reproducible from what is in the repo.
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Android needs a JDK; the Flutter action does not provide one.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: master
+          cache: true
+
+      - name: Name the version
+        id: v
+        run: echo "tag=${GITHUB_REF_NAME:-manual}" >> "$GITHUB_OUTPUT"
+
+      - name: Build the web app
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+          (cd dist && zip -qr "$GITHUB_WORKSPACE/aman-web-${{ steps.v.outputs.tag }}.zip" .)
+
+      - name: Build the API
+        working-directory: backend
+        run: |
+          npm ci
+          npx prisma generate
+          npm run build
+          npm run build:seed
+          zip -qr "$GITHUB_WORKSPACE/aman-backend-${{ steps.v.outputs.tag }}.zip" \
+            dist dist-seed prisma package.json package-lock.json
+
+      - name: Build the Android app
+        working-directory: mobile
+        run: |
+          flutter pub get
+          flutter build apk --release
+          cp build/app/outputs/flutter-apk/app-release.apk \
+            "$GITHUB_WORKSPACE/aman-${{ steps.v.outputs.tag }}.apk"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.v.outputs.tag }}" \
+            --title "Aman ${{ steps.v.outputs.tag }}" \
+            --notes-file .github/RELEASE_NOTES.md \
+            --verify-tag \
+            aman-web-*.zip aman-backend-*.zip aman-*.apk
