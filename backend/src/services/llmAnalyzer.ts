@@ -17,6 +17,7 @@
  * rule-only analysis.
  */
 import { z } from 'zod';
+import { claudeCliComplete, claudeCliModel, probeClaudeCli } from './claudeCli.js';
 
 export const LLM_CATEGORIES = [
   'PRIZE_SCAM',
@@ -52,11 +53,19 @@ function config() {
     url: (process.env.OLLAMA_URL ?? 'http://localhost:11434').replace(/\/+$/, ''),
     model: process.env.OLLAMA_MODEL ?? 'llama3.2',
     enabled: (process.env.LLM_ENABLED ?? 'auto').trim().toLowerCase(),
+    // "ollama" (default) or "claude-cli". The CLI provider borrows the Claude
+    // Code sign-in on the machine, so it needs no API key but cannot run in
+    // the Docker image. See claudeCli.ts.
+    provider: (process.env.LLM_PROVIDER ?? 'ollama').trim().toLowerCase(),
   };
 }
 
+function usingClaudeCli(): boolean {
+  return config().provider === 'claude-cli';
+}
+
 export function llmModel(): string {
-  return config().model;
+  return usingClaudeCli() ? claudeCliModel() : config().model;
 }
 
 // ---------------------------------------------------------------------------
@@ -73,6 +82,14 @@ export function resetLlmProbeCache(): void {
 async function probeOllama(): Promise<boolean> {
   const now = Date.now();
   if (probeCache && now - probeCache.at < PROBE_CACHE_TTL_MS) return probeCache.reachable;
+
+  // The CLI probe costs a real request, so the 60s cache above matters more
+  // here than it does for Ollama's free /api/tags.
+  if (usingClaudeCli()) {
+    const ok = await probeClaudeCli();
+    probeCache = { reachable: ok, at: now };
+    return ok;
+  }
 
   let reachable = false;
   try {
@@ -187,6 +204,13 @@ export function parseLlmContent(content: string): LlmVerdict | null {
  * Never throws — returns null on any failure or timeout (~12s).
  */
 export async function llmClassifyMessage(text: string): Promise<LlmVerdict | null> {
+  if (usingClaudeCli()) {
+    const content = await claudeCliComplete(SYSTEM_PROMPT, text);
+    // The CLI wraps its answer in a ```json fence despite being asked not to;
+    // parseLlmContent already strips fences, so nothing special is needed.
+    return content === null ? null : parseLlmContent(content);
+  }
+
   const { url, model } = config();
   try {
     const res = await fetch(`${url}/api/chat`, {
