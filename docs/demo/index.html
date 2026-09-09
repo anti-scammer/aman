@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>أمان · Aman — Palestinian User Protection Platform from Digital Fraud</title>
+<title>أمان · Aman · Palestinian User Protection Platform from Digital Fraud</title>
 <meta name="description" content="Graduation project demo: an Arabic-first web and mobile platform that helps Palestinian users check suspicious links, messages, accounts, and callers before acting on them.">
 <style>
   :root {
@@ -27,25 +27,56 @@
     --warn:      #b45309;
     --danger:    #c62828;
 
-    --r-sm: 8px;
-    --r-md: 14px;
-    --r-lg: 22px;
+    --r-sm: 10px;
+    --r-md: 18px;
+    --r-lg: 26px;
+    --r-xl: 34px;
     --shadow-sm: 0 1px 2px rgba(12,59,32,.06), 0 2px 8px rgba(12,59,32,.05);
     --shadow-md: 0 4px 14px rgba(12,59,32,.09), 0 14px 40px rgba(12,59,32,.08);
     --shadow-lg: 0 18px 50px rgba(12,59,32,.16);
     --maxw: 1140px;
+
+    /* Glass: one translucent face over a blurred, resaturated backdrop, a
+       hairline ring so the edge survives where face and page match, and an
+       inset highlight along the top that reads as light on the rim. */
+    --glass-blur: blur(22px) saturate(175%);
+    --glass-blur-heavy: blur(30px) saturate(190%);
+    --glass-face: linear-gradient(158deg, rgba(255,255,255,.92), rgba(255,255,255,.68));
+    --glass-face-soft: linear-gradient(158deg, rgba(255,255,255,.72), rgba(255,255,255,.42));
+    --glass-face-dark: linear-gradient(158deg, rgba(255,255,255,.14), rgba(255,255,255,.05));
+    --glass-edge: rgba(255,255,255,.75);
+    --glass-edge-dark: rgba(255,255,255,.2);
+    --glass-ring: 0 0 0 1px rgba(12,59,32,.06);
+    --glass-sheen: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(12,59,32,.04);
+    --glass-lift-1: 0 2px 6px -2px rgba(12,59,32,.1), 0 14px 30px -16px rgba(12,59,32,.32);
+    --glass-lift-2: 0 4px 12px -4px rgba(12,59,32,.14), 0 26px 54px -22px rgba(12,59,32,.42);
+    --glass-lift-3: 0 8px 20px -6px rgba(12,59,32,.18), 0 40px 80px -30px rgba(12,59,32,.5);
   }
 
   * { box-sizing: border-box; }
 
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
+  /* The page carries a low contrast wash of the brand colours, attached to the
+     viewport rather than the document, so panels pick up a different tint as
+     they scroll. Without it the frosted surfaces would have nothing to blur. */
   body {
     margin: 0;
-    background: var(--bg);
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(900px 700px at 6% -4%, rgba(47,138,85,.16), transparent 60%),
+      radial-gradient(820px 660px at 100% 8%, rgba(244,201,93,.15), transparent 62%),
+      radial-gradient(760px 620px at 92% 96%, rgba(198,40,40,.05), transparent 62%),
+      radial-gradient(1000px 800px at 26% 106%, rgba(26,107,60,.13), transparent 60%);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: var(--ink);
     font: 400 17px/1.65 ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    body { background-image: none; }
   }
 
   h1, h2, h3, h4 { line-height: 1.2; margin: 0; letter-spacing: -0.02em; }
@@ -60,9 +91,14 @@
   /* ---------- header ---------- */
   header.site {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(246,250,247,.86);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255,255,255,.84), rgba(255,255,255,.62));
+    backdrop-filter: var(--glass-blur-heavy);
+    -webkit-backdrop-filter: var(--glass-blur-heavy);
+    border-bottom: 1px solid rgba(255,255,255,.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      0 1px 0 rgba(12,59,32,.05),
+      0 16px 34px -28px rgba(12,59,32,.55);
   }
   .nav { display: flex; align-items: center; gap: 1.25rem; padding: .8rem 0; }
   .brand { display: flex; align-items: center; gap: .6rem; margin-inline-end: auto; text-decoration: none; color: inherit; }
@@ -77,6 +113,8 @@
   .hero {
     background:
       radial-gradient(1100px 520px at 78% -12%, rgba(127,199,154,.22), transparent 62%),
+      radial-gradient(640px 440px at 8% 108%, rgba(143,211,168,.2), transparent 68%),
+      radial-gradient(520px 340px at 58% 116%, rgba(244,201,93,.12), transparent 70%),
       linear-gradient(178deg, var(--brand-900), var(--brand-800) 62%, #0e4526);
     color: #eaf5ee;
     padding: 5.5rem 0 5rem;
@@ -87,10 +125,31 @@
     background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
     background-size: 26px 26px; opacity: .5;
   }
+  /* Two out-of-focus orbs drifting behind the copy, so the dark field has
+     somewhere to go instead of reading as a flat block of green. */
+  .hero::before {
+    content: ""; position: absolute; inset: -18%; pointer-events: none;
+    background:
+      radial-gradient(340px 340px at 24% 32%, rgba(143,211,168,.2), transparent 65%),
+      radial-gradient(280px 280px at 76% 70%, rgba(244,201,93,.14), transparent 65%);
+    filter: blur(34px);
+    animation: drift 28s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    from { transform: translate3d(-2%, -1.5%, 0) scale(1); }
+    to   { transform: translate3d(2.5%, 2%, 0) scale(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero::before { animation: none; }
+  }
   .hero .wrap { position: relative; z-index: 1; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: .5rem;
-    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+    background: var(--glass-face-dark);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge-dark);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.26);
     padding: .38rem 1rem; border-radius: 999px;
     font-size: .82rem; font-weight: 600; color: #cfe8d9;
   }
@@ -99,19 +158,40 @@
   .hero p.lede { font-size: clamp(1.03rem, 1.6vw, 1.22rem); color: #c8e0d3; max-width: 66ch; margin-top: 1rem; }
   .hero .meta { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: .55rem; }
   .pill {
-    background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16);
+    background: var(--glass-face-dark);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge-dark);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
     padding: .4rem .9rem; border-radius: 999px; font-size: .84rem; color: #d6ebdf; font-weight: 500;
   }
 
   /* ---------- stats ---------- */
-  .stats { background: var(--brand-900); border-top: 1px solid rgba(255,255,255,.09); padding: 2.2rem 0; }
+  .stats {
+    background: var(--brand-900);
+    border-top: 1px solid rgba(255,255,255,.09);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+    padding: 2.2rem 0;
+    /* Rounds off the dark block so it does not read as a screenshot pasted
+       onto the page. The hero above it stays square where the two meet. */
+    border-end-start-radius: var(--r-xl);
+    border-end-end-radius: var(--r-xl);
+  }
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; text-align: center; }
   .stat b { display: block; font-size: clamp(1.7rem, 3.4vw, 2.3rem); color: #fff; font-weight: 800; letter-spacing: -.03em; }
   .stat span { font-size: .82rem; color: #9ec4ae; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
 
   /* ---------- sections ---------- */
   section.band { padding: 4.5rem 0; }
-  section.band.alt { background: #fff; border-block: 1px solid var(--line); }
+  /* Alternating bands are a pane of frosted white laid over the page wash
+     rather than a solid fill, so the colour behind still shows through. */
+  section.band.alt {
+    background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.58));
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-block: 1px solid rgba(255,255,255,.65);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.6);
+  }
 
   .sec-head { max-width: 60ch; margin-bottom: 2.6rem; }
   .kicker {
@@ -140,24 +220,42 @@
   .tagrow { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1.2rem; }
   .tag {
     font-size: .76rem; font-weight: 700; padding: .26rem .68rem; border-radius: 999px;
-    background: var(--brand-50); color: var(--brand-700); border: 1px solid var(--brand-100);
+    background: linear-gradient(158deg, rgba(255,255,255,.85), rgba(238,247,241,.6));
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    color: var(--brand-700); border: 1px solid rgba(255,255,255,.85);
+    box-shadow: 0 0 0 1px rgba(26,107,60,.1), var(--glass-sheen);
   }
-  .tag.danger { background: #fdecec; color: var(--danger); border-color: #f7d3d3; }
-  .tag.warn   { background: #fdf3e4; color: var(--warn);   border-color: #f5e2c4; }
+  .tag.danger {
+    background: linear-gradient(158deg, rgba(253,236,236,.9), rgba(250,222,222,.62));
+    color: var(--danger); box-shadow: 0 0 0 1px rgba(198,40,40,.18), var(--glass-sheen);
+  }
+  .tag.warn {
+    background: linear-gradient(158deg, rgba(253,243,228,.9), rgba(250,234,206,.62));
+    color: var(--warn); box-shadow: 0 0 0 1px rgba(180,83,9,.18), var(--glass-sheen);
+  }
 
   /* ---------- browser frame ---------- */
   .browser {
-    border-radius: var(--r-lg); overflow: hidden; background: #fff;
-    box-shadow: var(--shadow-md); border: 1px solid var(--line);
+    border-radius: var(--r-lg); overflow: hidden;
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge);
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift-3);
   }
   .browser .bar {
     display: flex; align-items: center; gap: .45rem;
-    padding: .62rem .9rem; background: #eef2ef; border-bottom: 1px solid var(--line);
+    padding: .62rem .9rem;
+    background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(232,240,235,.55));
+    border-bottom: 1px solid rgba(255,255,255,.7);
   }
   .dot { width: 10px; height: 10px; border-radius: 50%; background: #cdd6d0; flex: none; }
   .dot.r { background: #f0a9a4; } .dot.y { background: #f2ce8f; } .dot.g { background: #a6d6b3; }
   .browser .url {
-    margin-inline-start: .55rem; flex: 1; background: #fff; border: 1px solid var(--line);
+    margin-inline-start: .55rem; flex: 1;
+    background: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.9);
+    box-shadow: 0 0 0 1px rgba(12,59,32,.06), inset 0 1px 3px -1px rgba(12,59,32,.14);
     border-radius: 999px; padding: .2rem .8rem; font-size: .72rem; color: var(--ink-faint);
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; overflow: hidden;
   }
@@ -174,18 +272,35 @@
   }
   .phone .screen { border-radius: 22px; overflow: hidden; background: #fff; position: relative; }
   .phone .notch {
-    position: absolute; top: 7px; left: 50%; transform: translateX(-50%);
-    width: 58px; height: 5px; border-radius: 999px; background: rgba(0,0,0,.32); z-index: 2;
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 58px;
+    height: 16px;
+    border-radius: 999px;
+    background: rgba(0,0,0,1);
+    z-index: 2;
   }
   .phone-cap { text-align: center; font-size: .82rem; color: var(--ink-faint); margin-top: .7rem; font-weight: 600; }
 
   /* ---------- gallery grid ---------- */
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.5rem; }
   .card {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--r-md);
-    overflow: hidden; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge); border-radius: var(--r-md);
+    overflow: hidden;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift-1);
+    display: flex; flex-direction: column;
+    transition: transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s ease;
   }
-  .card .cap { padding: .95rem 1.1rem; border-top: 1px solid var(--line); }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 1px rgba(47,138,85,.22), var(--glass-sheen), var(--glass-lift-2);
+  }
+  .card .cap { padding: .95rem 1.1rem; border-top: 1px solid rgba(255,255,255,.7); }
   .card .cap b { display: block; font-size: .95rem; }
   .card .cap span { font-size: .84rem; color: var(--ink-faint); }
   .card .thumb { height: 190px; overflow: hidden; background: var(--brand-50); }
@@ -193,18 +308,38 @@
 
   /* ---------- verdict legend ---------- */
   .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 1rem; margin-top: 2rem; }
-  .leg { border-radius: var(--r-md); padding: 1.1rem 1.25rem; border: 1px solid; }
+  /* Verdict panels keep the glass but tint the face toward the answer, so the
+     colour still carries the meaning at a glance. */
+  .leg {
+    border-radius: var(--r-md); padding: 1.1rem 1.25rem;
+    border: 1px solid rgba(255,255,255,.8);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+  }
   .leg b { display: block; font-size: 1rem; margin-bottom: .2rem; }
   .leg span { font-size: .87rem; opacity: .85; }
-  .leg.s { background: #ecf8ec; border-color: #c6e8c6; color: #0b6b0b; }
-  .leg.w { background: #fdf3e4; border-color: #f2ddbc; color: #96450a; }
-  .leg.d { background: #fdecec; border-color: #f5cfcf; color: #a91f1f; }
+  .leg.s {
+    background: linear-gradient(158deg, rgba(236,248,236,.94), rgba(214,240,214,.72));
+    color: #0b6b0b; box-shadow: 0 0 0 1px rgba(11,107,11,.22), var(--glass-sheen), var(--glass-lift-1);
+  }
+  .leg.w {
+    background: linear-gradient(158deg, rgba(253,243,228,.94), rgba(249,231,199,.72));
+    color: #96450a; box-shadow: 0 0 0 1px rgba(150,69,10,.22), var(--glass-sheen), var(--glass-lift-1);
+  }
+  .leg.d {
+    background: linear-gradient(158deg, rgba(253,236,236,.94), rgba(249,214,214,.72));
+    color: #a91f1f; box-shadow: 0 0 0 1px rgba(169,31,31,.22), var(--glass-sheen), var(--glass-lift-1);
+  }
 
   /* ---------- architecture ---------- */
   .arch { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.2rem; }
   .node {
-    background: #fff; border: 1px solid var(--line); border-radius: var(--r-md);
-    padding: 1.4rem; box-shadow: var(--shadow-sm);
+    background: var(--glass-face);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-edge); border-radius: var(--r-md);
+    padding: 1.4rem;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift-1);
   }
   .node h4 { font-size: 1.02rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .5rem; }
   .node .badge {
@@ -217,13 +352,23 @@
   /* ---------- note ---------- */
   .note {
     border-inline-start: 4px solid var(--brand-300);
-    background: var(--brand-50); padding: 1.3rem 1.5rem; border-radius: 0 var(--r-md) var(--r-md) 0;
+    background: linear-gradient(158deg, rgba(238,247,241,.9), rgba(255,255,255,.6));
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    padding: 1.3rem 1.5rem; border-radius: 0 var(--r-md) var(--r-md) 0;
+    box-shadow: var(--glass-ring), var(--glass-sheen), var(--glass-lift-1);
     color: var(--ink-soft); font-size: .97rem;
   }
   .note b { color: var(--ink); }
 
   /* ---------- footer ---------- */
-  footer.site { background: var(--brand-900); color: #a9c9b7; padding: 3rem 0 2.2rem; font-size: .92rem; }
+  footer.site {
+    background: var(--brand-900); color: #a9c9b7; padding: 3rem 0 2.2rem; font-size: .92rem;
+    border-top: 1px solid rgba(255,255,255,.1);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+    border-start-start-radius: var(--r-xl);
+    border-start-end-radius: var(--r-xl);
+  }
   footer.site h4 { color: #fff; font-size: 1.05rem; margin-bottom: .6rem; }
   .fgrid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 2.2rem; margin-bottom: 2.2rem; }
   @media (max-width: 760px) { .fgrid { grid-template-columns: 1fr; } }
@@ -232,8 +377,25 @@
 
   code {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .87em;
-    background: var(--brand-50); border: 1px solid var(--brand-100);
-    padding: .08em .38em; border-radius: 5px; color: var(--brand-800);
+    background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.85);
+    box-shadow: 0 0 0 1px rgba(26,107,60,.12);
+    padding: .08em .38em; border-radius: 6px; color: var(--brand-800);
+  }
+
+  /* Not every browser has backdrop-filter, and some readers turn transparency
+     off at the OS level. Both get the same solid panel: the layout, the ring
+     and the highlight all survive, only the see-through goes. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    header.site, section.band.alt, .card, .node, .browser, .note, .leg, .tag {
+      background: var(--card);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    header.site, section.band.alt, .card, .node, .browser, .note, .leg, .tag {
+      background: var(--card);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
   }
 </style>
 </head>
@@ -242,17 +404,17 @@
 <header class="site">
   <div class="wrap nav">
     <a class="brand" href="#top">
-      <svg viewBox="0 0 48 48" aria-hidden="true">
-        <defs><linearGradient id="sh" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#1a6b3c"/><stop offset="1" stop-color="#0c3b20"/>
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="amanShield" x1="0.1" y1="0" x2="0.9" y2="1">
+          <stop offset="0" stop-color="#2a8a51"/><stop offset="1" stop-color="#0d4526"/>
         </linearGradient></defs>
-        <path d="M24 3 L42 9.5 V23 C42 34.5 34.5 42.5 24 45.5 C13.5 42.5 6 34.5 6 23 V9.5 Z" fill="url(#sh)"/>
-        <path d="M24 36 C23 30 23 24 25.5 18.5" stroke="#e9f5ee" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M23.4 31.5 C19.5 31.5 17 29 16.5 25.5 C20.5 25.8 23 28 23.4 31.5 Z" fill="#7fc79a"/>
-        <path d="M23.6 31.5 C27.5 31 30 28.5 30.5 25 C26.5 25.4 24 27.8 23.6 31.5 Z" fill="#a8d8bb"/>
-        <path d="M23.5 25.5 C20 25.3 17.8 23 17.5 19.8 C21.2 20.2 23.3 22.3 23.5 25.5 Z" fill="#a8d8bb"/>
-        <path d="M24 25.3 C27.5 24.8 29.6 22.5 30 19.2 C26.3 19.8 24.3 22 24 25.3 Z" fill="#7fc79a"/>
-        <circle cx="25.8" cy="15.8" r="2.3" fill="#e9f5ee"/>
+        <path d="M32 3.5 L57.5 12 V31.5 C57.5 46.8 47.2 57.4 32 61.5 C16.8 57.4 6.5 46.8 6.5 31.5 V12 Z" fill="url(#amanShield)"/>
+        <path d="M28.8 52.5 C26.2 43 27 32.6 33.4 23.4" stroke="#f2fbf5" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+        <path d="M28.4 46.6 C20.8 47 15.6 42.6 14.3 34.8 C22.1 34.6 27.4 39 28.4 46.6 Z" fill="#8ed3a8"/>
+        <path d="M30.2 35.2 C23.6 34.2 19.6 29.4 19.6 22.6 C26.3 23.8 30.1 28.5 30.2 35.2 Z" fill="#8ed3a8"/>
+        <path d="M30 46.8 C37.4 45.4 41.8 40.2 41.8 32.8 C34.7 34.6 30.4 39.5 30 46.8 Z" fill="#d3edde"/>
+        <path d="M32.1 34.6 C38.5 32.6 42 27.2 41.4 20.4 C35.1 22.8 31.9 27.9 32.1 34.6 Z" fill="#d3edde"/>
+        <circle cx="34.6" cy="19.4" r="3.4" fill="#f4c95d"/>
       </svg>
       <span style="display:block">
         <b class="ar">أمان · Aman</b>
@@ -274,11 +436,11 @@
     <div class="arname ar" style="margin-top:1.4rem">منصة حماية المستخدم الفلسطيني من الاحتيال الرقمي</div>
     <h1>Check it before you trust it.</h1>
     <p class="lede">
-      Palestinian internet users are targeted by fraud built specifically for the local context — fake Jawwal
+      Palestinian internet users are targeted by fraud built specifically for the local context: fake Jawwal
       prize draws, cloned Bank of Palestine and PalPay login pages, delivery-fee scams, and "official"
       senders that are anything but. <strong style="color:#e8f5ed">Aman</strong> is an Arabic-first web and
       mobile platform that lets anyone check a link, a message, an account, or a caller <em>before</em> acting
-      on it — and report what they find so the next person is warned.
+      on it, and report what they find so the next person is warned.
     </p>
     <div class="meta">
       <span class="pill">Arabic-first · full RTL</span>
@@ -313,7 +475,7 @@
     </div>
 
     <div class="legend">
-      <div class="leg s"><b class="ar">آمن · Safe</b><span>No known fraud indicator found — which is not the same as trustworthy.</span></div>
+      <div class="leg s"><b class="ar">آمن · Safe</b><span>No known fraud indicator found, which is not the same as trustworthy.</span></div>
       <div class="leg w"><b class="ar">مشبوه · Suspicious</b><span>Some indicators present. Verify through an official channel first.</span></div>
       <div class="leg d"><b class="ar">خطير · Dangerous</b><span>Strong indicators. Don't click, don't pay, don't share codes.</span></div>
     </div>
@@ -328,7 +490,7 @@
       <h2>Four checkers, one explainable verdict</h2>
       <p>
         Every check returns a 0–100 risk score and the <em>reasons</em> behind it, in Arabic and English.
-        Nothing is a black box — a user can see exactly which signal fired.
+        Nothing is a black box. A user can see exactly which signal fired.
       </p>
     </div>
 
@@ -338,7 +500,7 @@
         <h3>URL checker</h3>
         <p>
           Local heuristics score a link before anyone visits it, then community reports and a
-          check-frequency signal are folded in — a URL suddenly being checked by many people is itself
+          check-frequency signal are folded in, since a URL suddenly being checked by many people is itself
           evidence of an active campaign.
         </p>
         <ul>
@@ -363,7 +525,7 @@
     <!-- Message analyzer -->
     <div class="feature flip">
       <div class="copy">
-        <h3>Message analyzer — and why "official" senders still get flagged</h3>
+        <h3>Message analyzer, and why "official" senders still get flagged</h3>
         <p>
           A weighted Arabic/English rule engine scores SMS and WhatsApp text, extracts any links, and runs
           them through the URL checker. Supplying the sender makes it sharper: a registered sender like
@@ -372,7 +534,7 @@
         <p style="margin-top:.9rem">
           But sender IDs are trivially spoofed. So when a message from an "official" sender asks for an OTP
           or carries a dangerous link, that reduction is withheld and a
-          <strong>spoofing warning</strong> is raised instead — because a real bank never asks for your code.
+          <strong>spoofing warning</strong> is raised instead, because a real bank never asks for your code.
         </p>
         <div class="tagrow">
           <span class="tag">OFFICIAL_SENDER</span>
@@ -401,7 +563,7 @@
         <ul>
           <li>Handle impersonation, scam keywords, digit-suffix patterns (<code>jawwal.prizes2026</code>)</li>
           <li>Platform detection across Facebook, Instagram, TikTok, Telegram, X, WhatsApp</li>
-          <li>A curated registry of genuine Palestinian senders — telecoms, banks, government</li>
+          <li>A curated registry of genuine Palestinian senders: telecoms, banks, government</li>
           <li>Phone normalization so <code>0599…</code>, <code>00970…</code> and <code>+970…</code> all match</li>
         </ul>
       </div>
@@ -428,7 +590,7 @@
       <div class="kicker">Community</div>
       <h2>Every report makes the next check smarter</h2>
       <p>
-        Reports are the platform's memory. A number reported by three people is flagged for everyone —
+        Reports are the platform's memory. A number reported by three people is flagged for everyone:
         on the website, in the API, and in the phone blocklist the mobile app screens calls against.
       </p>
     </div>
@@ -444,7 +606,7 @@
       </div>
       <div class="card">
         <div class="thumb"><img src="img/web-submit-report.jpg" alt="Submit a scam report form"></div>
-        <div class="cap"><b>Submit a report</b><span>Optional name — anonymous reporting is the default</span></div>
+        <div class="cap"><b>Submit a report</b><span>Optional name; anonymous reporting is the default</span></div>
       </div>
       <div class="card">
         <div class="thumb"><img src="img/web-flagged.jpg" alt="Flagged links feed showing recently detected dangerous URLs"></div>
@@ -470,7 +632,7 @@
       <h2>Nothing reaches the public unreviewed</h2>
       <p>
         Community data is only as good as its gatekeeping. Reports arrive as <code>PENDING</code> and are
-        invisible everywhere until a moderator publishes them — the queue below is the only path from a
+        invisible everywhere until a moderator publishes them. The queue below is the only path from a
         submitted report to public search and the mobile blocklist.
       </p>
     </div>
@@ -481,7 +643,7 @@
         <p>
           The console is reached by URL and never linked from the site navigation. It is guarded by a
           shared secret compared in constant time, and the API refuses to operate at all unless that
-          secret is configured — an unconfigured server rejects moderation rather than allowing it.
+          secret is configured, and an unconfigured server rejects moderation rather than allowing it.
         </p>
         <ul>
           <li>Token sent as a header, never in the URL where it would reach logs and history</li>
@@ -505,8 +667,8 @@
     </div>
 
     <div class="note">
-      <b>Why this matters more than it looks.</b> Approving a phone report doesn't just make it searchable —
-      it propagates into <code>/blocklist/phones</code>, which every mobile install syncs for offline call and
+      <b>Why this matters more than it looks.</b> Approving a phone report doesn't just make it searchable.
+      It propagates into <code>/blocklist/phones</code>, which every mobile install syncs for offline call and
       SMS screening. One moderator decision reaches every device.
     </div>
   </div>
@@ -552,7 +714,7 @@
         <h3>A warning the moment the phone rings</h3>
         <p>
           The app syncs the approved-report blocklist to the device, then matches every incoming call and
-          SMS against it natively — in Kotlin, without waking Dart. On a hit it draws a red bilingual
+          SMS against it natively, in Kotlin, without waking Dart. On a hit it draws a red bilingual
           warning card over whatever is on screen.
         </p>
         <ul>
@@ -577,9 +739,9 @@
     </div>
 
     <div class="note" style="margin-top:2.5rem">
-      <b>Why Android only — and why that is not a to-do item.</b> iOS structurally forbids this. No app can
+      <b>Why Android only, and why that is not a to-do item.</b> iOS structurally forbids this. No app can
       read incoming SMS content (<code>ILMessageFilter</code> only sorts unknown senders into fixed folders,
-      never returning the text), draw over other apps, or learn that a call arrived — <code>CallKit</code>
+      never returning the text), draw over other apps, or learn that a call arrived, because <code>CallKit</code>
       matches a pre-supplied list that the system reads directly. The portable piece is that blocklist: iOS
       could block matches <em>silently</em>, with no verdict, score, or explanation. It is documented as a
       platform limitation, not left as unfinished work.
@@ -595,7 +757,7 @@
       <h2>Not an English app that was translated</h2>
       <p>
         Arabic is the default and the layout is RTL from the ground up, built on CSS logical properties so
-        the entire interface mirrors correctly. English is a first-class toggle, not an afterthought —
+        the entire interface mirrors correctly. English is a first-class toggle, not an afterthought,
         and every analyzer reason ships in both languages.
       </p>
     </div>
@@ -621,7 +783,7 @@
       <div class="kicker">Architecture</div>
       <h2>One API, three clients, no vendor lock-in</h2>
       <p>
-        Detection runs server-side so the rules improve for every client at once — with an optional local
+        Detection runs server-side so the rules improve for every client at once, with an optional local
         LLM as a bounded second opinion that can never override the rules.
       </p>
     </div>
@@ -633,7 +795,7 @@
           <li>TypeScript, React Router</li>
           <li>12 routes incl. the moderation console</li>
           <li>Arabic-first RTL, ar/en toggle</li>
-          <li>52 tests — vitest + testing-library</li>
+          <li>52 tests, vitest + testing-library</li>
         </ul>
       </div>
       <div class="node">
@@ -642,7 +804,7 @@
           <li>Prisma ORM, Zod validation</li>
           <li>Rule engines for URL, message, social, sender</li>
           <li>Token-guarded moderation that fails closed</li>
-          <li>85 tests — vitest</li>
+          <li>85 tests, vitest</li>
         </ul>
       </div>
       <div class="node">
@@ -651,7 +813,7 @@
           <li>Shared API client, same verdicts</li>
           <li>Native call screening, SMS receiver, overlay</li>
           <li>On-device blocklist store</li>
-          <li>14 tests — flutter test</li>
+          <li>14 tests, flutter test</li>
         </ul>
       </div>
       <div class="node">
@@ -681,7 +843,7 @@
       <div>
         <h4 class="ar">أمان · Aman</h4>
         <p>
-          A graduation project — a free, Arabic-first platform helping Palestinian users recognize and
+          A graduation project: a free, Arabic-first platform helping Palestinian users recognize and
           report digital fraud. Every screenshot on this page is from the running application.
         </p>
       </div>
@@ -708,7 +870,7 @@
     </div>
     <div class="rule">
       Verdicts are produced by heuristics and pattern rules, not certainty. A "safe" result means no known
-      fraud indicator was found — never that something is trustworthy. · مشروع تخرج ٢٠٢٦
+      fraud indicator was found, never that something is trustworthy. · مشروع تخرج ٢٠٢٦
     </div>
   </div>
 </footer>
