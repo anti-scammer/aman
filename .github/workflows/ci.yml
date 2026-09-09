@@ -31,11 +31,20 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
-      # The Prisma client is generated, not committed, and the admin and
-      # blocklist suites import it. Without this the tests fail on a missing
-      # module rather than on anything real.
+      # The Prisma client is generated, not committed, and several suites
+      # import it. Without this the tests fail on a missing module rather
+      # than on anything real.
       - name: Generate the Prisma client
         run: npx prisma generate
+      # The SQLite file is gitignored, so a fresh checkout has no database at
+      # all and every DB-backed test errors on connect. Four tests go further
+      # and assert against specific seeded reports, so the seed has to run too.
+      # Locally these pass without either step only because a dev database is
+      # already sitting there from development.
+      - name: Create and seed the test database
+        run: |
+          npx prisma migrate deploy
+          npm run seed
       - name: Test
         run: npm test
       - name: Type check and build
