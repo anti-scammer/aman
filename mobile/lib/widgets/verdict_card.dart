@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/strings.dart';
+import '../theme.dart';
 import '../models/verdict.dart';
 
 /// Colors/icon/label for a [Verdict]: safe = green, suspicious = amber,
@@ -85,12 +86,14 @@ class VerdictCard extends StatelessWidget {
     final isArabic = context.isArabic;
 
     return Card(
-      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AmanGlass.radius),
         side: BorderSide(color: style.color.withValues(alpha: 0.6), width: 1.4),
       ),
-      color: style.color.withValues(alpha: 0.06),
+      color: Color.alphaBlend(
+        style.color.withValues(alpha: 0.1),
+        AmanGlass.face(theme.brightness),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

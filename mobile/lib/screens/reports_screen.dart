@@ -7,6 +7,7 @@ import '../models/flagged_url.dart';
 import '../models/report.dart';
 import '../widgets/app_illustration.dart';
 import '../widgets/error_retry.dart';
+import '../widgets/glass.dart';
 import '../widgets/verdict_card.dart';
 
 const List<String> kReportTypes = ['PHONE', 'URL', 'SOCIAL_ACCOUNT'];
@@ -79,8 +80,9 @@ class ReportsScreenState extends State<ReportsScreen> with SingleTickerProviderS
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Material(
-          color: Theme.of(context).colorScheme.surface,
+        // The tab strip sits directly under the frosted app bar, so it takes
+        // the same treatment rather than a flat surface fill.
+        GlassBar(
           child: TabBar(
             controller: _tabController,
             tabs: [
@@ -159,7 +161,7 @@ class _SearchTabState extends State<_SearchTab> with AutomaticKeepAliveClientMix
     super.build(context);
     final theme = Theme.of(context);
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: barSafeAll(context),
       children: [
         TextField(
           controller: _controller,
@@ -249,12 +251,7 @@ class _ReportTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: theme.colorScheme.errorContainer,
@@ -356,7 +353,7 @@ class _SubmitTabState extends State<_SubmitTab> with AutomaticKeepAliveClientMix
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: barSafeAll(context),
         children: [
           DropdownButtonFormField<String>(
             initialValue: _type,
@@ -494,17 +491,12 @@ class _FlaggedTabState extends State<_FlaggedTab> with AutomaticKeepAliveClientM
           onRefresh: () async => _reload(),
           child: ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
+            padding: barSafeAll(context),
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index];
               return Card(
-                elevation: 0,
                 margin: const EdgeInsets.only(bottom: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: theme.colorScheme.outlineVariant),
-                ),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(

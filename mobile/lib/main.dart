@@ -5,6 +5,9 @@ import 'api/api_client.dart';
 import 'api/api_scope.dart';
 import 'l10n/strings.dart';
 import 'screens/check_screen.dart';
+import 'theme.dart';
+import 'widgets/aman_logo.dart';
+import 'widgets/glass.dart';
 import 'screens/home_screen.dart';
 import 'screens/learn_screen.dart';
 import 'screens/protection_screen.dart';
@@ -47,17 +50,11 @@ class _AntiscammerAppState extends State<AntiscammerApp> {
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              theme: ThemeData(
-                useMaterial3: true,
-                colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF14532D)),
-              ),
-              darkTheme: ThemeData(
-                useMaterial3: true,
-                colorScheme: ColorScheme.fromSeed(
-                  seedColor: const Color(0xFF14532D),
-                  brightness: Brightness.dark,
-                ),
-              ),
+              theme: amanTheme(Brightness.light),
+              darkTheme: amanTheme(Brightness.dark),
+              // Every screen is drawn over the same page wash, so a frosted
+              // surface has something to blur no matter where it appears.
+              builder: (context, child) => AmanBackdrop(child: child ?? const SizedBox.shrink()),
               home: const MainShell(),
             );
           },
@@ -99,11 +96,17 @@ class _MainShellState extends State<MainShell> {
       const ProtectionScreen(),
     ];
     return Scaffold(
+      // The bottom bar is translucent, so content runs underneath it and the
+      // blur has something to work with. Screens make room for it with
+      // barSafeAll(). The app bar keeps its own row because the check and
+      // reports screens put a tab strip directly beneath it.
+      extendBody: true,
       appBar: AppBar(
+        flexibleSpace: const GlassBar(),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.shield_rounded, color: Theme.of(context).colorScheme.primary),
+            const AmanLogo(size: 26),
             const SizedBox(width: 8),
             Flexible(
               child: Text(
@@ -123,36 +126,39 @@ class _MainShellState extends State<MainShell> {
         ],
       ),
       body: IndexedStack(index: _tab, children: screens),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.home_outlined),
-            selectedIcon: const Icon(Icons.home_rounded),
-            label: context.tr('navHome'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.security_outlined),
-            selectedIcon: const Icon(Icons.security_rounded),
-            label: context.tr('navCheck'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.flag_outlined),
-            selectedIcon: const Icon(Icons.flag_rounded),
-            label: context.tr('navReports'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.school_outlined),
-            selectedIcon: const Icon(Icons.school_rounded),
-            label: context.tr('navLearn'),
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.shield_outlined),
-            selectedIcon: const Icon(Icons.shield_rounded),
-            label: context.tr('navProtection'),
-          ),
-        ],
+      bottomNavigationBar: GlassBar(
+        edge: GlassBarEdge.top,
+        child: NavigationBar(
+          selectedIndex: _tab,
+          onDestinationSelected: (i) => setState(() => _tab = i),
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home_rounded),
+              label: context.tr('navHome'),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.security_outlined),
+              selectedIcon: const Icon(Icons.security_rounded),
+              label: context.tr('navCheck'),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.flag_outlined),
+              selectedIcon: const Icon(Icons.flag_rounded),
+              label: context.tr('navReports'),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.school_outlined),
+              selectedIcon: const Icon(Icons.school_rounded),
+              label: context.tr('navLearn'),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.shield_outlined),
+              selectedIcon: const Icon(Icons.shield_rounded),
+              label: context.tr('navProtection'),
+            ),
+          ],
+        ),
       ),
     );
   }

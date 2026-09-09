@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../api/api_scope.dart';
 import '../l10n/strings.dart';
+import '../theme.dart';
 import '../models/quiz_question.dart';
 import '../widgets/error_retry.dart';
 
@@ -152,10 +153,11 @@ class _QuestionView extends StatelessWidget {
         if (answered) ...[
           const SizedBox(height: 12),
           Card(
-            elevation: 0,
-            color: (isCorrect ? const Color(0xFF2E7D32) : const Color(0xFFD32F2F))
-                .withValues(alpha: 0.08),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            color: Color.alphaBlend(
+              (isCorrect ? const Color(0xFF2E7D32) : const Color(0xFFD32F2F))
+                  .withValues(alpha: 0.12),
+              AmanGlass.face(Theme.of(context).brightness),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
@@ -226,11 +228,10 @@ class _OptionTile extends StatelessWidget {
         borderColor = theme.colorScheme.outlineVariant;
     }
     return Card(
-      elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       color: tileColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AmanGlass.radius),
         side: BorderSide(color: borderColor),
       ),
       child: ListTile(

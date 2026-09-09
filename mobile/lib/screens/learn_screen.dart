@@ -5,6 +5,7 @@ import '../l10n/strings.dart';
 import '../models/article.dart';
 import '../widgets/app_illustration.dart';
 import '../widgets/error_retry.dart';
+import '../widgets/glass.dart';
 import 'article_detail_screen.dart';
 import 'quiz_screen.dart';
 
@@ -50,7 +51,7 @@ class _LearnScreenState extends State<LearnScreen> {
           onRefresh: () async => _reload(),
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
+            padding: barSafeAll(context),
             children: [
               Center(
                 child: AppIllustration(
@@ -61,9 +62,7 @@ class _LearnScreenState extends State<LearnScreen> {
               ),
               const SizedBox(height: 12),
               Card(
-                elevation: 0,
-                color: theme.colorScheme.tertiaryContainer,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.62),
                 child: ListTile(
                   leading: Icon(Icons.quiz_rounded, color: theme.colorScheme.onTertiaryContainer),
                   title: Text(
@@ -101,12 +100,7 @@ class _LearnScreenState extends State<LearnScreen> {
               else
                 for (final article in articles)
                   Card(
-                    elevation: 0,
                     margin: const EdgeInsets.only(bottom: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: theme.colorScheme.outlineVariant),
-                    ),
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: theme.colorScheme.primaryContainer,

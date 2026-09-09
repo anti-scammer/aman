@@ -6,6 +6,7 @@ import '../l10n/strings.dart';
 import '../models/check_result.dart';
 import '../widgets/app_illustration.dart';
 import '../widgets/error_retry.dart';
+import '../widgets/glass.dart';
 import '../widgets/sender_trust_badge.dart';
 import '../widgets/verdict_card.dart';
 
@@ -43,8 +44,9 @@ class CheckScreenState extends State<CheckScreen> with SingleTickerProviderState
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Material(
-          color: Theme.of(context).colorScheme.surface,
+        // The tab strip sits directly under the frosted app bar, so it takes
+        // the same treatment rather than a flat surface fill.
+        GlassBar(
           child: TabBar(
             controller: _tabController,
             isScrollable: true,
@@ -151,7 +153,7 @@ class _UrlCheckerTabState extends State<_UrlCheckerTab>
   Widget build(BuildContext context) {
     super.build(context);
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: barSafeAll(context),
       children: [
         if (_result == null && !_failed)
           const _TabIntro(AppIllustrationAsset.spotUrl),
@@ -264,7 +266,7 @@ class _MessageAnalyzerTabState extends State<_MessageAnalyzerTab>
     super.build(context);
     final theme = Theme.of(context);
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: barSafeAll(context),
       children: [
         if (_result == null && !_failed)
           const _TabIntro(AppIllustrationAsset.spotMessage),
@@ -414,7 +416,7 @@ class _SocialCheckerTabState extends State<_SocialCheckerTab>
     super.build(context);
     final theme = Theme.of(context);
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: barSafeAll(context),
       children: [
         if (_result == null && !_failed)
           const _TabIntro(AppIllustrationAsset.spotSocial),
@@ -551,7 +553,7 @@ class _SenderCheckerTabState extends State<_SenderCheckerTab>
     final theme = Theme.of(context);
     final isArabic = context.isArabic;
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: barSafeAll(context),
       children: [
         if (_result == null && !_failed)
           const _TabIntro(AppIllustrationAsset.spotSender),
@@ -583,11 +585,6 @@ class _SenderCheckerTabState extends State<_SenderCheckerTab>
           SenderTrustBadge(sender: _result!),
           const SizedBox(height: 10),
           Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: theme.colorScheme.outlineVariant),
-            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(

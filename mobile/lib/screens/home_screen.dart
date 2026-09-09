@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../api/api_scope.dart';
+import '../widgets/aman_logo.dart';
 import '../l10n/strings.dart';
+import '../theme.dart';
 import '../models/report.dart';
 import '../widgets/app_illustration.dart';
 import '../widgets/error_retry.dart';
+import '../widgets/glass.dart';
 
 /// Home: intro, community stats (GET /reports/stats) and shortcuts to the
 /// other tabs.
@@ -41,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onRefresh: () async => _reload(),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: barSafeAll(context),
         children: [
           _IntroCard(theme: theme),
           const SizedBox(height: 20),
@@ -130,46 +133,44 @@ class _IntroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: theme.colorScheme.primaryContainer,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.shield_rounded, color: theme.colorScheme.primary, size: 34),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    context.tr('homeIntroTitle'),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onPrimaryContainer,
-                    ),
+    final onPanel =
+        theme.brightness == Brightness.dark ? AmanColors.brand100 : AmanColors.brand900;
+    // The one panel on the home screen that carries the brand, so it takes a
+    // green wash rather than the neutral face the rest of the cards use.
+    return GlassPanel(
+      tint: AmanColors.brand400.withValues(alpha: 0.16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const AmanLogo(size: 34),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  context.tr('homeIntroTitle'),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: onPanel,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: AppIllustration(
-                AppIllustrationAsset.hero,
-                size: 150,
-                semanticLabel: context.tr('homeIntroTitle'),
               ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: AppIllustration(
+              AppIllustrationAsset.hero,
+              size: 150,
+              semanticLabel: context.tr('homeIntroTitle'),
             ),
-            const SizedBox(height: 12),
-            Text(
-              context.tr('homeIntroBody'),
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onPrimaryContainer),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            context.tr('homeIntroBody'),
+            style: theme.textTheme.bodyMedium?.copyWith(color: onPanel),
+          ),
+        ],
       ),
     );
   }
@@ -189,11 +190,6 @@ class _StatsSection extends StatelessWidget {
       'SOCIAL_ACCOUNT': context.tr('typeSocial'),
     };
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -237,7 +233,6 @@ class _StatsSection extends StatelessWidget {
                   for (final entry in stats.byCategory.entries)
                     Chip(
                       visualDensity: VisualDensity.compact,
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
                       label: Text('${context.trCategory(entry.key)}: ${entry.value}'),
                     ),
                 ],
@@ -267,11 +262,6 @@ class _ShortcutCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,

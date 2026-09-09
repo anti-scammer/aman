@@ -4,6 +4,7 @@ import '../api/api_scope.dart';
 import '../l10n/strings.dart';
 import '../services/protection_service.dart';
 import '../widgets/app_illustration.dart';
+import '../widgets/glass.dart';
 
 /// Real-time protection tab (Android only).
 ///
@@ -109,7 +110,7 @@ class _ProtectionScreenState extends State<ProtectionScreen>
     final theme = Theme.of(context);
     final supported = _supported;
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: barSafeAll(context),
       children: [
         _ConsentCard(theme: theme),
         const SizedBox(height: 12),
@@ -163,11 +164,6 @@ class _ProtectionScreenState extends State<ProtectionScreen>
   Widget _syncCard(ThemeData theme) {
     final info = _info;
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -229,11 +225,6 @@ class _ProtectionScreenState extends State<ProtectionScreen>
 
   Widget _testCard(ThemeData theme) {
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -288,9 +279,7 @@ class _ConsentCard extends StatelessWidget {
     final otherLang = context.isArabic ? 'en' : 'ar';
     final otherBody = kStrings[otherLang]?['protConsentBody'] ?? '';
     return Card(
-      elevation: 0,
-      color: theme.colorScheme.primaryContainer,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.62),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -348,11 +337,6 @@ class _UnsupportedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -398,12 +382,7 @@ class _StatusTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      elevation: 0,
       margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
