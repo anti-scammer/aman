@@ -1,0 +1,83 @@
+# Runs the three test suites on every push and pull request.
+#
+# The jobs are deliberately separate rather than one script: a failure then
+# names the part of the project that broke, and the three run in parallel.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# A new push to the same branch makes the previous run irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      # The Prisma client is generated, not committed, and the admin and
+      # blocklist suites import it. Without this the tests fail on a missing
+      # module rather than on anything real.
+      - name: Generate the Prisma client
+        run: npx prisma generate
+      - name: Test
+        run: npm test
+      - name: Type check and build
+        run: npm run build
+
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  mobile:
+    name: Mobile
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      # The master channel on purpose: pubspec.yaml asks for a .dev Dart SDK
+      # (^3.12.0-235.0.dev), which stable does not ship.
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: master
+          cache: true
+      - run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test
